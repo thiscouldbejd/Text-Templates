@@ -1,0 +1,39 @@
+<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #>#Region " Network Interface Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Properties.tt", False, _
+	Ca("Pr_Names", "InBandwidthUsage", "InUnicastUsage", "InBroadcastUsage", "InMulticastUsage", "OutBandwidthUsage", "OutUnicastUsage", "OutBroadcastUsage", "OutMulticastUsage"), _
+	Ca("Pr_Types", Ac(8, "Caerus.PercentageValue")), _
+	Ca("Pr_Gets", _
+	String.Format("Return Caerus.DeltaCounter32.GetBandwidthUsage({0}, {1}, {2}, {3}, {4})", Pr_InUnicast, Pr_InBroadcast, Pr_InMulticast, Pr_InOctets, Pr_Speed), _
+	String.Format("Return Caerus.DeltaCounter32.GetProportionalUsage({0}, {1}, {2})", Pr_InUnicast, Pr_InBroadcast, Pr_InMulticast), _
+	String.Format("Return Caerus.DeltaCounter32.GetProportionalUsage({0}, {1}, {2})", Pr_InBroadcast, Pr_InUnicast, Pr_InMulticast), _
+	String.Format("Return Caerus.DeltaCounter32.GetProportionalUsage({0}, {1}, {2})", Pr_InMulticast, Pr_InUnicast, Pr_InBroadcast), _
+	String.Format("Return Caerus.DeltaCounter32.GetBandwidthUsage({0}, {1}, {2}, {3}, {4})", Pr_OutUnicast, Pr_OutBroadcast, Pr_OutMulticast, Pr_OutOctets, Pr_Speed), _
+	String.Format("Return Caerus.DeltaCounter32.GetProportionalUsage({0}, {1}, {2})", Pr_OutUnicast, Pr_OutBroadcast, Pr_OutMulticast), _
+	String.Format("Return Caerus.DeltaCounter32.GetProportionalUsage({0}, {1}, {2})", Pr_OutBroadcast, Pr_OutUnicast, Pr_OutMulticast), _
+	String.Format("Return Caerus.DeltaCounter32.GetProportionalUsage({0}, {1}, {2})", Pr_OutMulticast, Pr_OutUnicast, Pr_OutBroadcast)), _
+	Ca("Pr_Descriptions", _
+	"The In Bandwidth Usage", _
+	"The In Unicast Usage (e.g. proportion of In Packets Classified as Unicast)", _
+	"The In Broadcast Usage (e.g. proportion of In Packets Classified as Broadcast)", _
+	"The In Multicast Usage (e.g. proportion of In Packets Classified as Multicast)", _
+	"The Out Bandwidth Usage", _
+	"The Out Unicast Usage (e.g. proportion of Out Packets Classified as Unicast)", _
+	"The Out Broadcast Usage (e.g. proportion of Out Packets Classified as Broadcast)", _
+	"The Out Multicast Usage (e.g. proportion of Out Packets Classified as Multicast)")) #>
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Pr_Speed As String = "Speed"								'
+	Public Pr_InOctets As String = "InOctets"						'
+	Public Pr_InUnicast As String = "InUnicastPackets"				'
+	Public Pr_InBroadcast As String = "InBroadcastPackets"			'
+	Public Pr_InMulticast As String = "InMulticastPackets"			'
+	Public Pr_OutOctets As String = "OutOctets"						'
+	Public Pr_OutUnicast As String = "OutUnicastPackets"			'
+	Public Pr_OutBroadcast As String = "OutBroadcastPackets"		'
+	Public Pr_OutMulticast As String = "OutMulticastPackets"		'
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

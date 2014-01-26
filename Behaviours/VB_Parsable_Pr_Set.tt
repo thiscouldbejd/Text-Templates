@@ -1,0 +1,8 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# If Ae(Pr_Parsable, Pr_Name) Then #>
+<# Id(+0) #>Parse(<#= Va_Name #>)<# End If #><# Lf(+1) #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    ' TEMPLATE VARIABLES											'
+    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    Public Pr_Parsable As String()									' Names of Parsable Properties
+    ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

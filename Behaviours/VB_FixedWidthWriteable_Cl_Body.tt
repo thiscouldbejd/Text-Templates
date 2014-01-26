@@ -1,0 +1,132 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# Id(+0) #>#Region " FixedWidthWriteable Implementation "
+<# Lf(+1) #>
+<# Id(+1) #>Public Shared Function FixedWidthWriteable_Format( _
+<# Id(+1) #>ByVal value As <#= Sn(Cl_Name) #> _
+<# Id(-1) #>) As Leviathan.Visualisation.IFixedWidthWriteable
+<# Lf(+1) #>
+<# Id(+1) #>Return FixedWidthWriteable_Format(New <#= Sn(Cl_Name) #>() {value})
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function FixedWidthWriteable_Format( _
+<# Id(+1) #>ByVal values As System.Collections.Generic.IEnumerable(Of <#= Sn(Cl_Name) #>) _
+<# Id(-1) #>) As Leviathan.Visualisation.IFixedWidthWriteable
+<# Lf(+1) #>
+<# Id(+1) #>Dim slice_Rows As New List(Of Leviathan.Visualisation.Row)
+<# Lf(+1) #>
+<# Id(+0) #>For Each single_Value As <#= Sn(Cl_Name) #> In values
+<# Lf(+1) #>
+<# Id(+1) #>slice_Rows.Add( _
+<# Id(+0) #>New Leviathan.Visualisation.Row() _
+<# Id(+1) #><# For i = 0 To Ln(Fi_Fields) - 1 #>
+<# Id(+0) #>.Add(single_Value.<#= Fi_Field #>) _
+<# Id(+0) #><# Next #>
+<# Id(-1) #>)
+<# Lf(+1) #>
+<# Id(-1) #>Next
+<# Lf(+1) #>
+<# Id(+0) #>If slice_Rows.Count > 0 Then
+<# Lf(+1) #>
+<# Id(+1) #>Return Leviathan.Visualisation.Cube.Create(Leviathan.Visualisation.InformationType.Information, "<#= Fi_Title #>", _
+<# Id(+1) #><# For i = 0 To Ln(Fi_Headers) - 1 #>
+<# Id(+0) #>"<#= Fi_Header #>"<# If i < (Ln(Fi_Headers) - 1) Then #>,<# End If #> _
+<# Id(+0) #><# Next #>
+<# Id(-1) #>).Add(New Leviathan.Visualisation.Slice(slice_Rows))
+<# Lf(+1) #>
+<# Id(-1) #>Else
+<# Lf(+1) #>
+<# Id(+1) #>Return Nothing
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function FixedWidthWriteable_Choose( _
+<# Id(+1) #>ByRef host_Environment As Leviathan.Commands.ICommandsExecution, _
+<# Id(+0) #>ByRef selection_List As System.Collections.IList, _
+<# Id(+0) #>Optional ByVal question As String = Nothing, _
+<# Id(+0) #>Optional ByVal allow_New As Boolean = False, _
+<# Id(+0) #>Optional ByRef is_New As Boolean = False, _
+<# Id(+0) #>Optional ByVal ignore_FieldsForNew As String() = Nothing, _
+<# Id(+0) #>Optional ByVal allow_Null As Boolean = False, _
+<# Id(+0) #>Optional ByVal null_Statement As String = Nothing, _
+<# Id(-1) #>) As <#= Sn(Cl_Name) #>
+<# Lf(+1) #>
+<# Id(+1) #>Dim return_Value As <#= Sn(Cl_Name) #>
+<# Lf(+1) #>
+<# Id(+0) #>If String.IsNullOrEmpty(question) Then question = "Please Choose <#= Sn(Cl_Name) #>"
+<# Id(+0) #>If String.IsNullOrEmpty(null_Statement) Then null_Statement =  "None of these"
+<# Lf(+1) #>
+<# Id(+0) #>If allow_New Then
+<# Lf(+1) #>
+<# Id(+1) #>return_Value = CType(host_Environment.SelectionResponse(selection_List, question, New String() { _
+<# Id(+1) #><# For i As Integer = 0 To Fi_Fields.Length - 1 #>
+<# Id(+0) #>"<#= Fi_Fields(i) #>"<# If i < Fi_Fields.Length - 1 Then #>,<# End If #> _
+<# Id(+0) #><# Next #>
+<# Id(-1) #>}, "CREATE NEW <#= Sn(Cl_Name) #>"), <#= Sn(Cl_Name) #>)
+<# Lf(+1) #>
+<# Id(+0) #>If return_Value Is Nothing Then
+<# Lf(+1) #>
+<# Id(+1) #>return_Value = New <#= Sn(Cl_Name) #>()
+<# Id(+0) #><# For Fd_Current = 0 To Ln(Fd_Names) - 1 #><# If Pr_Writeable() Then #>
+<# Lf(+1) #>If (ignore_FieldsForNew Is Nothing OrElse String.IsNullOrEmpty(Array.Find(ignore_FieldsForNew, Function(x) x.ToLower() = "<#= Fd_Name.ToLower() #>"))) Then
+<# Id(+1) #>Dim field_Value As String = host_Environment.StringResponse("Please Enter the value for the field: <#= Fd_Name #>", True)
+<# Id(+0) #><# If Fd_Type.ToLower().EndsWith(".string") Then #>
+<# Id(+0) #>If Not String.IsNullOrEmpty(field_Value) Then return_Value.<#= Fd_Name #> = field_Value
+<# Id(-1) #><# Else #>
+<# Id(+0) #>If Not String.IsNullOrEmpty(field_Value) Then return_Value.<#= Fd_Name #> = CType(host_Environment.StringParser.Parse(field_Value, New Boolean, GetType(<#= Fd_Type #>)), <#= Fd_Type #>)
+<# Id(-1) #><# End If #>End If
+<# Id(+0) #><# End If #><# Next #>
+<# Lf(+1) #>is_New = True
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>ElseIf allow_Null
+<# Lf(+1) #>
+<# Id(+1) #>return_Value = CType(host_Environment.SelectionResponse(selection_List, question, New String() { _
+<# Id(+1) #><# For i As Integer = 0 To Fi_Fields.Length - 1 #>
+<# Id(+0) #>"<#= Fi_Fields(i) #>"<# If i < Fi_Fields.Length - 1 Then #>,<# End If #> _
+<# Id(+0) #><# Next #>
+<# Id(-1) #>}, null_Statement), <#= Sn(Cl_Name) #>)
+<# Lf(+1) #>
+<# Id(-1) #>Else
+<# Lf(+1) #>
+<# Id(+1) #>return_Value = CType(host_Environment.SelectionResponse(selection_List, question, New String() { _
+<# Id(+1) #><# For i As Integer = 0 To Fi_Fields.Length - 1 #>
+<# Id(+0) #>"<#= Fi_Fields(i) #>"<# If i < Fi_Fields.Length - 1 Then #>,<# End If #> _
+<# Id(+0) #><# Next #>
+<# Id(-1) #>}), <#= Sn(Cl_Name) #>)
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #>Return return_Value
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INTERNAL VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private i As Integer = 0										' Current Iterative Index
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Fi_Title As String
+	Public Fi_Fields As String()
+	Public Fi_Headers As String()
+
+	Public ReadOnly Property Fi_Field() As String
+		Get
+			Return Sn(Av(Fi_Fields, i))
+		End Get
+	End Property
+
+	Public ReadOnly Property Fi_Header() As String
+		Get
+			Return Av(Fi_Headers, i)
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

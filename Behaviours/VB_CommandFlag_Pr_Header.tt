@@ -1,0 +1,56 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# If Ae(Pr_CommandFlag, Pr_Name, i) Then #>
+<# Id(+0) #><Leviathan.Configuration.Configurable("<#= Fl_Flag #>", ResourceContainingType:=GetType(<#= Cl_Name #>), ResourceName:="<#= Fl_Resource #>", Description:="<#= Fl_Description #>"<# If Hv(Fl_Arg) #>, ArgsDescription:="<#= Fl_Arg #>"<# End If #>, Prefix:="<#= Fl_Prefix #>"<# If Hv(Fl_Default) #>, DefaultValue:="<#= Fl_Default #>"<# End If #>)> _<# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INTERNAL VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private i As Integer = 0										' Current Iterative Index
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Pr_CommandFlag As String()								' Name of Flagged Properties
+	Public Fl_Flags As String()										' Names of the Flagged Properties
+	Public Fl_Descriptions As String()								' Descriptions of the Flagged Properties
+	Public Fl_Args As String()										' Args of the Flagged Properties
+	Public Fl_Resource As String = "CommandDetails"					' Resource Location of the Flag Details
+	Public Fl_Prefixes As String()									' Prefixes for the Flagged Properties
+	Public Fl_Defaults As String()									' Defaults for the Flagged Properties
+
+	Public ReadOnly Property Fl_Flag() As String
+		Get
+			Return Av(Fl_Flags, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Fl_Description() As String
+		Get
+			Return Av(Fl_Descriptions, i)
+		End Get
+	End Property
+		
+	Public ReadOnly Property Fl_Arg() As String
+		Get
+			Return Av(Fl_Args, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Fl_Prefix() As String
+		Get
+			If Hv(Fl_Flag) AndAlso (Char.IsPunctuation(Fl_Flag, 0) OrElse Char.IsSymbol(Fl_Flag, 0)) Then
+				Return Av(Fl_Prefixes, i, String.Empty)
+			ElseIf Hv(Fl_Flag) Then
+				Return Av(Fl_Prefixes, i, "/")
+			Else
+				Return String.Empty
+			End If
+		End Get
+	End Property
+
+	Public ReadOnly Property Fl_Default() As String
+		Get
+			Return Av(Fl_Defaults, i)
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

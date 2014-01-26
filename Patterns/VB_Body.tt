@@ -1,0 +1,9 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #>#Region " Class Plumbing/Interface Code "
+<# Lf(+1) #><# Id(+1) #><#= Cl_Body #><# Lf(+2) #>
+<# Id(-1) #>#End Region<#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Cl_Body As String										' Body of the Class
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

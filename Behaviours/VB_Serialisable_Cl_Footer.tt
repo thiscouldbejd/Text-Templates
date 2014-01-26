@@ -1,0 +1,2 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Behaviours\VB_Serialisable.tt" #><# If Se_IncludeCode #>
+<# Id(+0) #>Implements System.Xml.Serialization.IXmlSerializable<# End If #>

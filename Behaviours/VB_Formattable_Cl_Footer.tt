@@ -1,0 +1,2 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #>Implements System.IFormattable

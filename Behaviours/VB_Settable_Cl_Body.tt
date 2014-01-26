@@ -1,0 +1,17 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# Id(+0) #>#Region " Settable Implementation "
+<# Lf(+1) #>
+<# Id(+1) #>#Region " Public Methods "
+<# Lf(+1) #>
+<# Id(+1) #><# For Fd_Current = 0 to Ln(Pr_Names) - 1 #>
+<# Id(+0) #><# If Hv(Pr_Set) Then #>Public Function <#= String.Format("Set{0}", Pr_Name) #>(<#= Pa_Name #> As <#= Pr_Type #>) As <#= Cl_Name #>
+<# Lf(+1) #>
+<# Id(+1) #><#= Sn(Pr_Name) #> = <#= Pa_Name #>
+<# Id(+0) #>Return Me
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #><# End If #>
+<# Id(+0) #><# Next #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #>

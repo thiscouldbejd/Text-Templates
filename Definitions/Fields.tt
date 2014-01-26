@@ -1,0 +1,459 @@
+﻿<#+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Fd_Current As Integer = 0								' Used to Track the 'Current' Field
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' FIELD VARIABLES												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Fd_Accessiblities As String()							' Accessibilities of the Fields (a)
+	Public Fd_Descriptions As String()								' Descriptions of the Fields (d)
+	Public Fd_Events As Boolean()									' Whether the Fields generate Events (e)
+	Public Fd_Defaults As String()									' Default Value for the Fields (f)
+	Public Fd_Implements As String()								' Implements of the Fields (i)
+	Public Fd_Mappings As Dictionary(Of String, String)()			' Mappings of the Fields (m)
+	Public Fd_Names As String()										' Names of the Fields (n)
+	Public Fd_Overridables As Boolean()								' Overridables of the Fields (o)
+	Public Fd_Types As String()										' Types of the Fields (t)
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' PROPERTY VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Pr_Headers As String()									' Headers of the Properties
+	Public Pr_Footers As String()									' Footers of the Properties
+	Public Pr_Gets As String()										' Get Statements of the Properties
+	Public Pr_Sets As String()										' Set Statements of the Properties
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' FIELD PROPERTIES												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Fd_Accessiblity As String				' Accessibility of the Current Field
+		Get
+			Return Av(Fd_Accessiblities, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_Default As String					' Default for the Current Field
+		Get
+			Return Av(Fd_Defaults, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_Description As String				' Description of the Current Field
+		Get
+			Return Av(Fd_Descriptions, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_Event As Boolean					' Whether the Current Field generates Events
+		Get
+			Return Av(Fd_Events, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_MappingContains( _
+		ByVal name As String _
+	) As Boolean
+		Get
+			Return Not Av(Fd_Mappings, Fd_Current) Is Nothing AndAlso Av(Fd_Mappings, Fd_Current).ContainsKey(name)
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_Mapping( _
+		ByVal name As String _
+	) As String()													' Mapping of the Current Field
+		Get
+			If Not Av(Fd_Mappings, Fd_Current) Is Nothing AndAlso Av(Fd_Mappings, Fd_Current).ContainsKey(name) Then
+				Return (Av(Fd_Mappings, Fd_Current)(name)).Split(";")
+			Else
+				Return Nothing
+			End If
+		End Get
+  End Property
+
+	Public ReadOnly Property Fd_Name As String						' Name of the Current Field
+		Get
+			Return Av(Fd_Names, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_Type As String						' Type of the Current Field
+		Get
+			Return Av(Fd_Types, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_ActualType As System.Type			' Actual Type of the Current Field
+		Get
+			Dim return_Type As System.Type = Nothing
+			Try
+				return_Type = Type.GetType(Fd_Type)
+			Catch ex As Exception
+			End Try
+			Return return_Type
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_Get As String						' Variable/Property that can 'Get' the Current Field (prefers Property)
+		Get
+			If Pr_Readable Then
+				Return Pr_Name
+			Else
+				Return Va_Name
+			End If
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_Set As String						' Variable/Property that can 'Set' the Current Field (prefers Property)
+		Get
+			If Pr_Writeable Then
+				Return Pr_Name
+			Else
+				Return Va_Name
+			End If
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_IsNullable As Boolean				' Whether the Field is a Nullable Type
+		Get
+			Return Fd_Type.ToLower().Contains("nullable(of ") AndAlso _
+				Fd_Type.EndsWith(")")
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_IsGuid As Boolean					' Whether the Field is a Guid
+		Get
+			Return (Fd_Type.TrimEnd(")").ToLower().EndsWith("system.guid") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("guid"))
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_IsDateTime As Boolean				' Whether the Field is a DateTime
+		Get
+			Return (Fd_Type.TrimEnd(")").ToLower().EndsWith("system.datetime") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("datetime"))
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_IsString As Boolean					' Whether the Field is a String
+		Get
+			Return (Fd_Type.TrimEnd(")").ToLower().EndsWith("system.string") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("string"))
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_IsInteger As Boolean				' Whether the Field is an Integer
+		Get
+			Return (Fd_Type.TrimEnd(")").ToLower().EndsWith("system.byte") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("system.sbyte") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("byte") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("system.int16") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("system.uint16") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("int16") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("system.int32") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("system.uint32") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("int32") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("system.int64") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("system.uint64") OrElse _
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("int64"))
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_IsSystemType As Boolean				' Whether the Field is a System Type
+		Get
+			Return Fd_Type.ToLower().StartsWith("system.") OrElse _
+				Fd_Type.ToLower().Contains("(system.")
+		End Get
+	End Property
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' CONSTANT PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Cn_Names As String()					' Names of the Property-Naming Constants
+		Get
+			Return Af(Fd_Names, "PROPERTY_{0:U}")
+		End Get
+	End Property
+
+	Public ReadOnly Property Cn_Name As String						' Name of the Current Property-Naming Constants
+		Get
+			Return Av(Cn_Names, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Cn_Values As String()					' Values of the Property-Naming Constants
+		Get
+			Return Fd_Names
+		End Get
+	End Property
+
+	Public ReadOnly Property Cn_Value As String						' Value of the Current Property-Naming Constants
+		Get
+			Return Av(Cn_Values, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Cn_Descriptions As String()			' Descriptions of the Property-Naming Constants
+		Get
+			Return Af(Fd_Names, "Public Shared Reference to the Name of the Property: {0}")
+		End Get
+	End Property
+
+	Public ReadOnly Property Cn_Description As String				' Description of the Current Property-Naming Constants
+		Get
+			Return Av(Cn_Descriptions, Fd_Current)
+		End Get
+	End Property
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' PROPERTY PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Pr_Names As String()					' Names of the Properties
+		Get
+			Return Fd_Names
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Name As String						' Name of the Current Property
+		Get
+			Return Av(Pr_Names, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Descriptions As String()			' Descriptions of the Properties
+		Get
+			Return Af(Fd_Names, "Provides Access to the Property: {0}")
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Description As String				' Description of the Current Property
+		Get
+			Return Av(Pr_Descriptions, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Implements As String()				' Implements of the Properties
+		Get
+			Return Fd_Implements
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Implement As String					' Implement of the Current Property
+		Get
+			Return Av(Pr_Implements, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Types As String()					' Types of the Properties
+		Get
+			Return Fd_Types
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Type As String						' Type of the Current Property
+		Get
+			Return Av(Pr_Types, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Overridables As Boolean()			' Overridables of the Properties
+		Get
+			Return Fd_Overridables
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Overridable As Boolean				' Overridable of the Current Properties
+		Get
+			Return Av(Pr_Overridables, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Header As String					' Header of the Current Property
+		Get
+			Return Av(Pr_Headers, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Footer As String					' Footer of the Current Property
+		Get
+			Return Av(Pr_Footers, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Get As String						' Get Statement/s of the Current Property
+		Get
+			Return Av(Pr_Gets, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Set As String						' Set Statement/s of the Current Property
+		Get
+			Return Av(Pr_Sets, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Readable As Boolean					' Whether the Current Property is Readable
+		Get
+			If Hv(Fd_Accessiblity) Then Return Fd_Accessiblity.IndexOf("R") >= 0 Else Return False
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Writeable As Boolean				' Whether the Current Property is Writeable
+		Get
+			If Hv(Fd_Accessiblity) Then Return Fd_Accessiblity.IndexOf("W") >= 0 Else Return False
+		End Get
+	End Property
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' VARIABLE PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Va_Names As String()					' Names of the Field Variables
+		Get
+			Return Af(Fd_Names, "m_{0}")
+		End Get
+	End Property
+
+	Public ReadOnly Property Va_Name As String						' Name of the Current Field Variable
+		Get
+			Return Av(Va_Names, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Va_Descriptions As String()			' Descriptions of the Field Variables
+		Get
+			Return Af(Fd_Names, "Private Data Storage Variable for Property: {0}")
+		End Get
+	End Property
+
+	Public ReadOnly Property Va_Description As String				' Descriptions of the Current Field Variables
+		Get
+			Return Av(Va_Descriptions, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Va_Types As String()					' Types of the Field Variables
+		Get
+			Return Fd_Types
+		End Get
+	End Property
+
+	Public ReadOnly Property Va_Type As String						' Type of the Current Field Variable
+		Get
+			Return Av(Va_Types, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Va_Events As Boolean()					' Whether the Field Variables generate Events
+		Get
+			Return Fd_Events
+		End Get
+	End Property
+
+	Public ReadOnly Property Va_Event As Boolean					' Whether the Current Field Variable generates Events
+		Get
+			Return Av(Va_Events, Fd_Current)
+		End Get
+	End Property
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' PARAMETER PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Pa_Names As String()					' Names of the Field Parameters
+		Get
+			Return Af(Fd_Names, "_{0}")
+		End Get
+	End Property
+
+	Public ReadOnly Property Pa_Name As String						' Name of the Current Field Parameter
+		Get
+			Return Av(Pa_Names, Fd_Current)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pa_Types As String()					' Types of the Field Parameters
+		Get
+			Return Fd_Types
+		End Get
+	End Property
+
+	Public ReadOnly Property Pa_Type As String						' Type of the Current Field Parameter
+		Get
+			Return Av(Pa_Types, Fd_Current)
+		End Get
+	End Property
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INDEXING METHODS												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Function SetCurrentField( _
+		ByVal fieldName As String _
+	) As Boolean
+
+		For i As Integer = 0 To Ln(Fd_Names) - 1
+			If String.Compare(fieldName, Av(Fd_Names, i), True) = 0 Then
+				Fd_Current = i
+				Return True
+			End If
+		Next
+
+		Return False
+
+	End Function
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' ADDITION METHODS												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Sub Add_Field( _
+		Optional ByVal a As String = "RW", _
+		Optional ByVal d As String = Nothing, _
+		Optional ByVal e As Boolean = False, _
+		Optional ByVal f As String = Nothing, _
+		Optional ByVal i As String = Nothing, _
+		Optional ByVal m As String = Nothing, _
+		Optional ByVal n As String = Nothing, _
+		Optional ByVal o As Boolean = False, _
+		Optional ByVal t As String = Nothing _
+	)																' Method to Add a Field
+
+		Ao(Fd_Accessiblities, a)
+		Ao(Fd_Descriptions, d)
+		Ao(Fd_Events, e)
+		Ao(Fd_Defaults, f)
+		Ao(Fd_Implements, i)
+		Ao(Fd_Names, n)
+		Ao(Fd_Overridables, o)
+		Ao(Fd_Types, t)
+
+		If Hv(m) Then
+
+			Dim mappings As String() = m.Split(PIPE)
+
+			Dim mappingDictionary As New Dictionary(Of String, String)
+
+			For each mapping As String in mappings
+
+				If mapping.Contains(COLON) Then
+					mappingDictionary.Add(mapping.Split(COLON)(0), mapping.Split(COLON)(1))
+				Else
+					mappingDictionary.Add(mapping, String.Empty)
+				End If
+
+			Next
+
+			Ao(Fd_Mappings, mappingDictionary)
+
+		Else
+
+			Ao(Fd_Mappings, Nothing)
+
+		End If
+
+	End Sub
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

@@ -1,0 +1,9 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #><System.ComponentModel.DefaultProperty("<#= Pr_Name #>")> _
+<# Id(+0) #><System.Web.UI.ToolboxData("<{0}:<#= Cl_Name #> runat=server></{0}:<#= Cl_Name #>>")> _<#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Cl_Name As String										' Name of the Class
+	Public Pr_Name As String										' Name of the Property (n)
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

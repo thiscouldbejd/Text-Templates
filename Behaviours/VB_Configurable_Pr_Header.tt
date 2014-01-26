@@ -1,0 +1,8 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# If Ae(Pr_Configurable, Pr_Name) Then #>
+<# Id(+0) #><Leviathan.Configuration.Configurable("<#= Pr_Name #>")> _<# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Pr_Configurable As String()								' Names of the Configurable Properties
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

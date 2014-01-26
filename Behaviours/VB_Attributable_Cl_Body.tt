@@ -1,0 +1,28 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #><#@ include file="%TEMPLATES_PATH%\Behaviours\VB_Attributable.tt" #>
+<# If Hv(At_Targets) AndAlso (At_Targets.IndexOf("Field") >=0 OrElse At_Targets.IndexOf("Property")) Then #>
+<# Id(+0) #>#Region " Attributable Implementation "
+<# Lf(+1) #>
+<# Id(+1) #>#Region " Public Shared Methods "
+<# Lf(+1) #>
+<# Id(+1) #>Public Shared Function GetMember( _
+<# Id(+1) #>ByVal onType As Type _
+<# Id(-1) #>) As Leviathan.Inspection.MemberAnalyser
+<# Lf(+1) #>
+<# Id(+1) #>Return GetSingleObject(GetMembers(onType))
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function GetMembers( _
+<# Id(+1) #>ByVal onType As Type _
+<# Id(+-1) #>) As Leviathan.Inspection.MemberAnalyser()
+<# Lf(+1) #>
+<# Id(+1) #>Return Leviathan.Inspection.TypeAnalyser.GetInstance(onType) _
+<# Id(+1) #>.ExecuteQuery(Leviathan.Inspection.AnalyserQuery.QUERY_MEMBERS_READABLE _
+<# Id(+1) #>.SetPresentAttribute(GetType(<#= Cl_Name #>)) _
+<# Id(-2) #>)
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #><# End If #>

@@ -1,0 +1,10 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Behaviours\VB_Serialisable.tt" #><# If Se_IncludeCode #>
+<# Id(+0) #>#Region " IXmlSerialisable Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Methods.tt", False, Cp("Md_Visibility", "Public"), Ca("Md_Names", "IXmlSerialisable_GetSchema", "IXmlSerialisable_ReadXml", "IXmlSerialisable_WriteXml"), _
+	Ca("Md_ReturnTypes", "System.Xml.Schema.XmlSchema"), Ca("Md_Implements", "System.Xml.Serialization.IXmlSerializable.GetSchema", "System.Xml.Serialization.IXmlSerializable.ReadXml", "System.Xml.Serialization.IXmlSerializable.WriteXml"), _
+	Ca("Md_Bodies", "Return Leviathan.Configuration.XmlSerialiser.GenerateSchema(Me.GetType)", "Leviathan.Configuration.XmlSerialiser.ReadXml(Me, reader)", "Leviathan.Configuration.XmlSerialiser.WriteXml(Me, writer)"), _
+	Ca("Md_ParametersNames", Nothing, New String() {"reader"}, New String() {"writer"}), Ca("Md_ParametersTypes", Nothing, New String() {"System.Xml.XmlReader"}, New String() {"System.Xml.XmlWriter"}), _
+	Ca("Md_Descriptions", "Method to Return Schema Depicting Object/Class", "", "")) #>
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #><# End If #>

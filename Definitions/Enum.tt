@@ -1,0 +1,69 @@
+﻿<#+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public En_Current As Integer = 0								' Used to Track the 'Current' Enumeration
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' ENUM VARIABLES												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public En_Type As String										' Type of the Enum (t)
+	Public En_Bitwise As Boolean									' Whether the Enum is a Bitwise Enum (b)
+	Public En_Names As String()										' Enum Option Names (n)
+	Public En_Descriptions As String()								' Enum Option Descriptions (d)
+	Public En_Values As Int64()										' Enum Option Values (v)
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' ENUM PROPERTIES												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property En_Name As String						' Name of the Current Enumeration
+		Get
+			Return Av(En_Names, En_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property En_Description As String				' Description of the Current Enumeration
+		Get
+			Return Av(En_Descriptions, En_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property En_Value As String						' Value of the Current Enumeration
+		Get
+			Return Av(En_Values, En_Current)
+		End Get
+	End Property
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' ADDITION METHODS												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Sub Add_Enum( _
+		Optional ByVal b As Boolean = False, _
+		Optional ByVal d As String = Nothing, _
+		Optional ByVal n As String = Nothing, _
+		Optional ByVal t As String = "System.Int32", _
+		Optional ByVal v As Int64 = -1 _
+	)																' Method to Add an Enumeration
+		
+		If b = True Then En_Bitwise = b
+		
+		If String.IsNullOrEmpty(d) Then d = n
+		Ao(En_Descriptions, d)
+		
+		Ao(En_Names, n)
+
+		If Not Hv(En_Type) Then En_Type = t
+		
+		If v < 0 Then
+		If En_Bitwise Then
+				v = 2 ^ (En_Names.Length - 1)
+			Else
+				v = En_Names.Length
+			End If
+		End If
+
+		Ao(En_Values, v)
+
+	End Sub #>

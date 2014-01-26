@@ -1,0 +1,62 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# Id(+0) #>#Region " Singleton Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Constructors.tt", True, Cp("Ct_Visibility", "Private")) #>
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Private Shared Variables "
+<# Lf(+1) #>
+<# Id(+1) #>Private Shared <# If Ln(Fd_Names) > 0 Then #>Singleton_Instances As New Hashtable<# Else #>Singleton_Instance As <#= Cl_Name #><# End If #>
+<# Lf(+2) #>
+<# Id(+0) #>Private Shared <# If Ln(Fd_Names) > 0 Then #>Singleton_Instances<# Else #>Singleton_Instance<# End If #>_LOCK As New Object
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Public Shared Functions "
+<# Id(+1) #><# If Cl_DefaultConstructor Then #><# Lf(+1) #>
+<# Id(+0) #>Public Shared Function GetInstance() As <#= Cl_Name #>
+<# Lf(+1) #>
+<# Id(+1) #><# If Ln(Fd_Names) > 0 Then #>
+<# Id(+0) #>SyncLock Singleton_Instances_LOCK
+<# Lf(+1) #>
+<# Id(+1) #>If Not Singleton_Instances.Contains(0) Then Singleton_Instances(0) = New <#= Cl_Name #>()
+<# Id(+0) #>Return Singleton_Instances(0)
+<# Lf(+1) #>
+<# Id(-1) #>End SyncLock
+<# Id(+0) #><# Else #>
+<# Id(+0) #>SyncLock Singleton_Instance_LOCK
+<# Lf(+1) #>
+<# Id(+1) #>If Singleton_Instance Is Nothing Then Singleton_Instance = New <#= Cl_Name #>()
+<# Id(+0) #>Return Singleton_Instance
+<# Lf(+1) #>
+<# Id(-1) #>End SyncLock
+<# Id(+0) #><# End If #>
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #><# End If #>
+<# Lf(+1) #>
+<# Id(+0) #><# For i As Integer = 0 to Ln(Fd_Names) - 1 #>
+<# Id(+0) #>Public Shared Function GetInstance( _
+<# Id(+1) #><# For Fd_Current = 0 to i #>
+<# Id(+0) #>ByVal <#= Pa_Name #> As <#= Fd_Type #><# If Fd_Current < i Then #>,<# End If #> _<# Lf(+1) #>
+<# Id(+0) #><# Next   #>
+<# Id(-1) #>) As <#= Cl_Name #>
+<# Lf(+1) #>
+<# Id(+1) #>Dim instance_Hashcode As Integer = _
+<# Id(+1) #>Leviathan.Caching.Simple.CombineHashCodes(<# For Fd_Current = 0 to i #><#= Pa_Name #><# If Fd_Current < i Then #>, <# End If #><# Next #>)
+<# Lf(+1) #>
+<# Id(-1) #>SyncLock Singleton_Instances_LOCK
+<# Lf(+1) #>
+<# Id(+1) #>If Not Singleton_Instances.Contains(instance_Hashcode) Then Singleton_Instances(instance_Hashcode) = _
+<# Id(+1) #>New <#= Cl_Name #>(<# For Fd_Current = 0 to i #><#= Pa_Name #><# If Fd_Current < i Then #>, <# End If #><# Next #>)
+<# Lf(+1) #>
+<# Id(-2) #>End SyncLock
+<# Lf(+1) #>
+<# Id(+0) #>Return Singleton_Instances(instance_Hashcode)
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #><# Next #>
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(-1) #>#End Region

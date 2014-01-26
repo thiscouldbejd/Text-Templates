@@ -1,0 +1,12 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #>#Region " INotifyPropertyChanged Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Events.tt", False, Cp("Ev_Visibility", "Public"), Ca("Ev_Names", "INotifyPropertyChanged_PropertyChanged"), _
+	Ca("Ev_ParametersNames", New String() {"sender", "e"}), Ca("Ev_ParametersTypes", New String() {"System.Object", "System.ComponentModel.PropertyChangedEventArgs"}), Ca("Ev_Descriptions", ""), _
+	Ca("Ev_Implements", "System.ComponentModel.INotifyPropertyChanged.PropertyChanged")) #>
+<# Lf(+1) #>
+<# Id(+0) #><#= Ct("Patterns", "VB_Methods.tt", False, Cp("Md_Visibility", "Protected"), Ca("Md_Names", "INotifyPropertyChanged_RaiseChanged"), _
+	Ca("Md_Bodies", "RaiseEvent INotifyPropertyChanged_PropertyChanged(Me, New System.ComponentModel.PropertyChangedEventArgs(propertyName))"), _
+	Ca("Md_ParametersNames", New String() {"propertyName"}), Ca("Md_ParametersTypes", New String() {"System.String"}), Ca("Md_Descriptions", "")) #>
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #>

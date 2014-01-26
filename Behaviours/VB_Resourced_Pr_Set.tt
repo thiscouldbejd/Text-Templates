@@ -1,0 +1,8 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# If Ae(Pr_Resourced, Pr_Name) Then #>
+<# Id(+0) #><#= Va_Name #> = GetResourcedValue(<#= Va_Name #>)<# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Pr_Resourced As String()									' Names of Resourced Properties
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

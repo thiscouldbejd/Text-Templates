@@ -1,0 +1,122 @@
+﻿<#@ import namespace="System.IO.Path" #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' CLASS VARIABLES												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Cl_Namespace As String									' Namespace of Class (a)
+	Public Cl_DefaultConstructor As Boolean							' Whether the Class has a Default Constructor (c)
+	Public Cl_Description As String									' Description of Class (d)
+	Public Cl_Assembly As String									' Assembly Containing the Class (e)
+	Public Cl_Generated As Boolean									' Includes Generation Attribute (g)
+	Public Cl_Inherits As String									' Name of Inherited Class (i)
+	Public Cl_Mappings As Dictionary(Of String, String)				' Mapping Names of the Class (m)
+	Public Cl_Name As String										' Name of the Class (n)
+	Public Cl_PostConstructionCall As String						' Post Construction Method Call (p)
+	Public Cl_Singleton As Boolean									' Whether the Class is a Singleton (s)
+	Public Cl_NotInheritable As Boolean								' Whether the Class is not Inheritable (Sealed) (u)
+	Public Cl_Visibility As String									' Visibility of the Class (v)
+	Public Cl_MustInherit As Boolean								' Whether the Class is marked as Must Inherit (x)
+	Public Cl_Header As String										' Header of the Class
+	Public Cl_Footer As String										' Footer of the Class
+	Public Cl_Body As String										' Body of the Class
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' CLASS PROPERTIES												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Cl_MappingContains( _
+		ByVal name As String _
+	) As Boolean													' Whether the Class includes a particular Mapping
+		Get
+			Return Not Cl_Mappings Is Nothing AndAlso _
+				Cl_Mappings.ContainsKey(name)
+		End Get
+	End Property
+
+	Public ReadOnly Property Cl_Mapping( _
+		ByVal name As String _
+	) As String														' Mapping of the Current Class
+		Get
+			If Cl_MappingContains(name) Then
+				Return Cl_Mappings(name)
+			Else
+				Return Nothing
+			End If
+		End Get
+	End Property
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' ADDITION METHODS												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Sub Add_Class( _
+		Optional ByVal a As String = Nothing, _
+		Optional ByVal c As Boolean = True, _
+		Optional ByVal d As String = Nothing, _
+		Optional ByVal e As String = Nothing, _
+		Optional ByVal g As Boolean = True, _
+		Optional ByVal i As String = "System.Object", _
+		Optional ByVal m As String = Nothing, _
+		Optional ByVal n As String = Nothing, _
+		Optional ByVal p As String = Nothing, _
+		Optional ByVal s As Boolean = False, _
+		Optional ByVal u As Boolean = False, _
+		Optional ByVal v As String = "Public", _
+		Optional ByVal x As Boolean = False _
+	)																' Method to Add a Class
+
+		Cl_Namespace = a
+
+		Cl_DefaultConstructor = c
+
+		Cl_Description = d
+
+		Cl_Assembly = e
+
+		Cl_Generated = g
+
+		Cl_Inherits = i
+
+		If Hv(m) Then
+
+			Dim mappings As String() = m.Split(PIPE)
+
+			Cl_Mappings = New Dictionary(Of String, String)
+
+			For each mapping As String in mappings
+
+				If mapping.Contains(COLON) Then
+					Cl_Mappings.Add(mapping.Split(COLON)(0), mapping.Split(COLON)(1))
+				Else
+					Cl_Mappings.Add(mapping, String.Empty)
+				End If
+
+			Next
+
+		End If
+
+		If String.IsNullOrEmpty(n) Then
+
+			Cl_Name = GetFileNameWithoutExtension(Tp)
+
+			If Cl_Name.IndexOf("-") >= 0 Then Cl_Name = _
+				Cl_Name.Split("-")(Cl_Name.Split("-").Length - 1)
+
+		Else
+
+			Cl_Name = n
+
+		End If
+
+		Cl_PostConstructionCall = p
+
+		Cl_Singleton = s
+
+		Cl_NotInheritable = u
+
+		Cl_Visibility = v
+
+		Cl_MustInherit = x
+
+		If Cl_MustInherit Then Cl_NotInheritable = False
+
+	End Sub #>

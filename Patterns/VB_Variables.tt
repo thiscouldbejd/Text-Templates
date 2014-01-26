@@ -1,0 +1,64 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #>#Region " <#= Va_Visibility #> Variables "
+<# Lf(+1) #>
+<# Id(+1) #><# For i = 0 to Ln(Va_Names) - 1 #>
+<# Id(+0) #><#= Ct("Patterns", "VB_Variable.tt", True) #>
+<# Lf(+1) #><# Next   #>
+<# Id(-1) #>#End Region<#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INTERNAL VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private i As Integer = 0										' Current Iterative Index
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Va_Visibility As String = "Private"						' Visibility of the Variables
+	Public Va_Names As String() = New String() {}					' Names of the Variables (n)
+	Public Va_Descriptions As String() = New String() {}			' Descriptions of the Variables (d)
+	Public Va_Remarks As String() = New String() {}					' Remarks for the Variables (r)
+	Public Va_Types As String() = New String() {}					' Types of the Variables (t)
+	Public Va_Events As Boolean() = New Boolean() {}				' Whether the Variables Generate Events (e)
+	Public Va_Defaults As String() = New String() {}				' Defaults for the Variables (f)
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Va_Name() As String
+		Get
+			Return Av(Va_Names, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Va_Description() As String
+		Get
+			Return Av(Va_Descriptions, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Va_Remark() As String
+		Get
+			Return Av(Va_Remarks, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Va_Type() As String
+		Get
+			Return Av(Va_Types, i, "System.Object")
+		End Get
+	End Property
+
+	Public ReadOnly Property Va_Event() As Boolean
+		Get
+			Return Av(Va_Events, i, False)
+		End Get
+	End Property
+
+	Public ReadOnly Property Va_Default() As String
+		Get
+			Return Av(Va_Defaults, i)
+		End Get
+	End Property
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

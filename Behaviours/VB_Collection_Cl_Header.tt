@@ -1,0 +1,3 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Behaviours\VB_Collection.tt" #>
+<# Id(+0) #><Leviathan.Name(Name:="<#= Cl_Name #>")> _
+<# Id(+0) #><Leviathan.Collections.ElementType(GetType(<#= Cl_ElementType #>))> _

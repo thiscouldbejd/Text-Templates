@@ -1,0 +1,10 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# If Hv(Tb_Category) #><# Id(+0) #><System.ComponentModel.Bindable(True)> _
+<# Id(+0) #><System.ComponentModel.Category("<#= Tb_Category #>")> _
+<# Id(+0) #><System.ComponentModel.DefaultValue("<# If Hv(Tb_Default) Then #><#= Tb_Default #><# End If #>")> _<# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Tb_Category As String									' Toolbox Category
+	Public Tb_Default As String										' Toolbox Default
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

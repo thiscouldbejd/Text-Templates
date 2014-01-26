@@ -1,0 +1,47 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #><#= St(Ev_Description) #>
+<# Id(+0) #><#= Rt(Ev_Remark) #>
+<# Id(+0) #><#= Ev_Visibility #> Event <#= Sn(Ev_Name) #>(<# If Not Ev_Parametered Then #>)<# If Hv(Ev_Implement) Then #> Implements <#= Ev_Implement #><# End If #><# Else #> _<# End If #>
+<# Id(+0) #><# If Ev_Parametered Then #><# Id(+1) #><# Lf(+1) #><# For i = 0 to Ln(Ev_ParameterNames) - 1 #>
+<# Id(+0) #>ByVal <#= Ev_ParameterName #> As <#= Ev_ParameterType #><# If i < Ln(Ev_ParameterNames) - 1 Then #>,<# End If #> _
+<# Id(+0) #><# Next #>
+<# Id(-1) #>)<# If Hv(Ev_Implement) Then #> Implements <#= Ev_Implement #><# End If #><# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INTERNAL VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private i As Integer = 0										' Current Iterative Index
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Ev_Visibility As String									' Visibility of the Event
+	Public Ev_Name As String										' Name of the Event (n)
+	Public Ev_Description As String									' Description of the Event (d)
+	Public Ev_Remark As String										' Remark for the Event (r)
+	Public Ev_ParameterNames As String() = New String() {}			' Parameter Names for the Event (p)
+	Public Ev_ParameterTypes As String() = New String() {}			' Parameter Types for the Event (q)
+	Public Ev_Implement As String									' Implement of the Event (i)
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Ev_Parametered() As Boolean
+		Get
+			Return Ln(Ev_ParameterNames) > 0
+		End Get
+	End Property
+
+	Public ReadOnly Property Ev_ParameterName() As String
+		Get
+			Return Av(Ev_ParameterNames, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Ev_ParameterType() As String
+		Get
+			Return Av(Ev_ParameterTypes, i, "System.Object")
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

@@ -1,0 +1,8 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# If Ae(Pr_Unique, Pr_Name) Then #>
+<# Id(+0) #><Leviathan.Unique()> _<# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Pr_Unique As String()									' Name of Unique Properties
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

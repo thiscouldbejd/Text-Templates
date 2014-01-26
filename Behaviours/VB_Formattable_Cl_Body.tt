@@ -1,0 +1,162 @@
+﻿<#@ import namespace="System.Collections" #><#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# Id(+0) #>#Region " IFormattable Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Constants.tt", False, Ca("Cn_Names", "PROPERTY_ASSTRING"), Ca("Cn_Values", "AsString"), Ca("Cn_Descriptions", "Public Shared Reference to the Name of the Property: AsString")) #>
+<# Lf(+1) #>
+<# Id(+0) #><#= Ct("Patterns", "VB_Properties.tt", False, Ca("Pr_Names", "AsString"), Ca("Pr_Types", "System.String"), Ca("Pr_Gets", "Return Me.ToString()")) #>
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Public Shared Methods "
+<# Lf(+1) #>
+<# Id(+1) #><# For i as integer = 0 to Ln(Fo_Names) - 1 #>
+<# Dim format As String = Av(Fo_Values, i) #>
+<# Dim formatName as String = "default" #>
+<# If Not String.IsNullOrEmpty(Av(Fo_Names, i)) Then formatName = Av(Fo_Names, i) #>
+<# Dim parameterNames As New ArrayList() #>
+<# Dim parameterTypes As New ArrayList() #>
+<# For Fd_Current = 0 To Ln(Pr_Names) - 1 #>
+<# If format.IndexOf("{" & Pr_Name & "}") >=0 Then #>
+<# parameterNames.Add(Pr_Name) #>
+<# parameterTypes.Add(Pr_Type) #>
+<# format = format.Replace("{" & Pr_Name & "}", "{" & (parameterNames.Count - 1) & "}") #>
+<# End If #><# Next #>
+<# formatNames.Add(formatName) #>
+<# formatParameters.Add(parameterNames) #>
+<# If parameterNames Is Nothing OrElse parameterNames.Count = 0 Then #>
+<# Id(+0) #>Public Shared Function ToString_<#= formatName #>() As String
+<# Else   #>
+<# Id(+0) #>Public Shared Function ToString_<#= formatName #>( _
+<# Id(+1) #>
+<# For j as integer = 0 to parameterNames.Count - 1 #>
+<# If j < parameterNames.Count - 1 Then #>
+<# Id(+0) #>ByVal <#= parameterNames(j) #> As <#= parameterTypes(j) #>, _
+<# Else   #>
+<# Id(+0) #>ByVal <#= parameterNames(j) #> As <#= parameterTypes(j) #> _
+<# End If #><# Next   #>
+<# Id(-1) #>) As String
+<# Lf(+1) #><# End If #>
+<# If parameterNames Is Nothing OrElse parameterNames.Count = 0 Then #>
+<# Id(+1) #>Return String.Format("<#= format #>")
+<# Else   #>
+<# Id(+1) #>Return String.Format( _
+<# Id(+1) #>"<#= format #>", _
+<# End If #>
+<# For j as integer = 0 to parameterNames.Count - 1 #>
+<# If j < parameterNames.Count - 1 Then #>
+<# Id(+0) #><#= parameterNames(j) #>, _
+<# Else   #>
+<# Id(+0) #><#= parameterNames(j) #>)
+<# End If #><# Next   #>
+<# Lf(+1) #>
+<# Id(-2) #>End Function
+<# Lf(+1) #><# Next   #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Public Methods "
+<# Lf(+1) #>
+<# Id(+1) #>Public Overloads Overrides Function ToString() As String
+<# Lf(+1) #>
+<# Id(+1) #>Return Me.ToString(String.Empty, Nothing)
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Overloads Function ToString( _
+<# Id(+1) #>ByVal format As String _
+<# Id(-1) #>) As String
+<# Lf(+1) #>
+<# Id(+1) #><# For i as Integer = 0 to formatNames.Count - 1 #>
+<# If formatNames(i) = "default" Then #>
+<# Id(+0) #>If String.IsNullOrEmpty(format) OrElse String.Compare(format, "<#= formatNames(i).ToLower() #>", True) = 0 Then
+<# Lf(+1) #>
+<# If formatParameters(i) Is Nothing OrElse formatParameters(i).Count = 0 Then #>
+<# Id(+1) #>Return ToString_<#= formatNames(i) #>()
+<# Else #>
+<# Id(+1) #>Return ToString_<#= formatNames(i) #>( _
+<# Id(+1) #><# For j as Integer = 0 to formatParameters(i).Count - 1 #>
+<# If j < formatParameters(i).Count - 1 Then #>
+<# Id(+0) #><#= formatParameters(i)(j) #>, _
+<# Else   #>
+<# Id(+0) #><#= formatParameters(i)(j) #> _
+<# Id(-1) #>)
+<# End If #><# Next   #><# End If #>
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Else   #>
+<# Id(+0) #>If String.Compare(format, "<#= formatNames(i).ToLower() #>", True) = 0 Then
+<# Lf(+1) #>
+<# If formatParameters(i) Is Nothing OrElse formatParameters(i).Count = 0 Then #>
+<# Id(+1) #>Return ToString_<#= formatNames(i) #>()
+<# Else   #>
+<# Id(+1) #>Return ToString_<#= formatNames(i) #>( _
+<# Id(+1) #><# For j as Integer = 0 to formatParameters(i).Count - 1 #>
+<# If j < formatParameters(i).Count - 1 Then #>
+<#= formatParameters(i)(j) #>, _
+<# Else   #>
+<#= formatParameters(i)(j) #> _
+<# Id(-1) #>)
+<# End If #><# Next   #><# End If #>
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# End If #><# Next   #>
+<# Id(+0) #>Return String.Empty
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Overloads Function ToString( _
+<# Id(+1) #>ByVal format As String, _
+<# Id(+0) #>ByVal formatProvider As System.IFormatProvider _
+<# Id(-1) #>) As String Implements System.IFormattable.ToString
+<# Lf(+1) #>
+<# Id(+1) #><# For i as Integer = 0 to formatNames.Count - 1 #>
+<# If formatNames(i) = "default" Then #>
+<# Id(+0) #>If String.IsNullOrEmpty(format) OrElse String.Compare(format, "<#= formatNames(i).ToLower() #>", True) = 0 Then	
+<# Lf(+1) #>
+<# If formatParameters(i) Is Nothing OrElse formatParameters(i).Count = 0 Then #>
+<# Id(+1) #>Return ToString_<#= formatNames(i) #>()
+<# Else #>
+<# Id(+1) #>Return ToString_<#= formatNames(i) #>( _
+<# Id(+1) #><# For j as Integer = 0 to formatParameters(i).Count - 1 #>
+<# If j < formatParameters(i).Count - 1 Then #>
+<# Id(+0) #><#= formatParameters(i)(j) #>, _
+<# Else   #>
+<# Id(+0) #><#= formatParameters(i)(j) #> _
+<# Id(-1) #>)
+<# End If #><# Next   #><# End If #>
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Else   #>
+<# Id(+0) #>If String.Compare(format, "<#= formatNames(i).ToLower() #>", True) = 0 Then
+<# Lf(+1) #>
+<# If formatParameters(i) Is Nothing OrElse formatParameters(i).Count = 0 Then #>
+<# Id(+1) #>Return ToString_<#= formatNames(i) #>()
+<# Else   #>
+<# Id(+1) #>Return ToString_<#= formatNames(i) #>( _
+<# Id(+1) #><# For j as Integer = 0 to formatParameters(i).Count - 1 #>
+<# If j < formatParameters(i).Count - 1 Then #>
+<#= formatParameters(i)(j) #>, _
+<# Else   #>
+<#= formatParameters(i)(j) #> _
+<# Id(-1) #>)
+<# End If #><# Next   #><# End If #>
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# End If #><# Next   #>
+<# Id(+0) #>Return String.Empty
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Fo_Names As String()
+	Public Fo_Values As String()
+
+	Private formatNames As New ArrayList()
+	Private formatParameters As New ArrayList()
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

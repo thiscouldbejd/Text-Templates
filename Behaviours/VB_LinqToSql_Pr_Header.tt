@@ -1,0 +1,2 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# If Hv(Fd_Mapping("Db-Field"), 0) Then #><System.Data.Linq.Mapping.Column(Name:="<#= Av(Fd_Mapping("Db-Field"), 0) #>"<# If Fd_MappingContains("Db-Key") Then #>, IsPrimaryKey:=True<# End If #><# If Fd_MappingContains("Db-Version") Then #>, IsVersion:=True<# End If #><# If Not Pr_Writeable Then #>, Storage:="<#= Fd_Set #>"<# End If #>)> _<# End If #>

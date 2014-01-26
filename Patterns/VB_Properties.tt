@@ -1,0 +1,109 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #>#Region " <#= Pr_Visibility #> Properties "
+<# Lf(+1) #>
+<# Id(+1) #><# For i = 0 to Ln(Pr_Names) - 1 #>
+<# Id(+0) #><# If Hv(Pr_Get) OrElse Hv(Pr_Set) Then #><#= Ct("Patterns", "VB_Property.tt", True) #><# Lf(+2) #><# Else #><# If i = Ln(Pr_Names) - 1 Then #><# Lf(+1) #><# End If #><# End If #>
+<# Id(+0) #><# Next   #>
+<# Id(-1) #>#End Region<#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INTERNAL VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private i As Integer = 0										' Current Iterative Index
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Pr_Visibility As String = "Public"						' Visibility of the Properties
+	Public Pr_Names As String() = New String() {}					' Names of the Properties (n)
+	Public Pr_Descriptions As String() = New String() {}			' Descriptions of the Properties (d)
+	Public Pr_Remarks As String() = New String() {}					' Remarks for the Properties (r)
+	Public Pr_Types As String() = New String() {}					' Types of the Properties (t)
+	Public Pr_Headers As String() = New String() {}					' Headers of the Properties (h)
+	Public Pr_Gets As String() = New String() {}					' Gets of the Properties (g)
+	Public Pr_Sets As String() = New String() {}					' Sets of the Properties (s)
+	Public Pr_Implements As String() = New String() {}				' Implements of the Properties (i)
+	Public Pr_Defaults As Boolean() = New Boolean() {}				' Defaults of the Properties
+	Public Pr_Shadows As Boolean() = New Boolean() {}				' Shadows of the Properties
+	Public Pr_Overridables As Boolean() = New Boolean() {}  ' Overridables of the Properties (o)
+	Public Pr_ParametersNames As String()()							' Parameter Names of the Properties (p)
+	Public Pr_ParametersTypes As String()()							' Parameter Types of the Properties (q)
+
+	Public ReadOnly Property Pr_Name() As String
+		Get
+			Return Av(Pr_Names, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Description() As String
+		Get
+			Return Av(Pr_Descriptions, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Remark() As String
+		Get
+			Return Av(Pr_Remarks, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Type() As String
+		Get
+			Return Av(Pr_Types, i, "System.Object")
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Header() As String
+		Get
+			Return Av(Pr_Headers, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Get() As String
+		Get
+			Return Av(Pr_Gets, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Set() As String
+		Get
+			Return Av(Pr_Sets, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Implement() As String
+		Get
+			Return Av(Pr_Implements, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Default() As Boolean
+		Get
+			Return Av(Pr_Defaults, i, False)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Shadow() As Boolean
+		Get
+			Return Av(Pr_Shadows, i, False)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_Overridable As Boolean
+	Get
+	  Return Av(Pr_Overridables, i, False)
+	End Get
+	End Property
+
+	Public ReadOnly Property Pr_ParameterNames As String()
+		Get
+			Return Av(Pr_ParametersNames, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_ParameterTypes As String()
+		Get
+			Return Av(Pr_ParametersTypes, i)
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

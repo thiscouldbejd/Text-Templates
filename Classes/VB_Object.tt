@@ -1,0 +1,101 @@
+﻿<#@ template language="VB" debug="False" hostspecific="True" culture="en-GB" #><#@ output extension=".vb" #>
+<#@ include file="%TEMPLATES_PATH%\Code\Functions.tt" #>
+<#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #>
+<#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<#@ include file="%TEMPLATES_PATH%\Definitions\Methods.tt" #>
+<#@ include file="%TEMPLATES_PATH%\Definitions\Behaviours.tt" #><# PrepareTransform() #>
+<# Id(+0) #><# If Hv(Cl_Namespace) Then #>Namespace <#= Cl_Namespace #><# Lf(+2) #><# Id(+1) #><# End If #>
+<# Id(+0) #><#= St(Cl_Description) #>
+<# Id(+0) #><#= Ge() #><# Lf(+1) #><#= Gd() #><# Lf(+1) #><#= Gf() #><# Lf(+1) #><#= Gs() #><# Lf(+1) #><#= Gt("Classes", "VB_Object.tt") #><# Lf(+1) #><#= Gv(1) #>
+<# Id(+0) #><# If Cl_Generated Then #><#= Ga(Tp(), 1) #><# Lf(+1) #><# End If #>
+<# Id(+0) #><# If Hv(Cl_Header) Then #><#= Cl_Header #><# Lf(+1) #><# End If #>
+<# Id(+0) #>Partial <#= Cl_Visibility #> <# If Cl_NotInheritable Then #>NotInheritable <# End If #><# If Cl_MustInherit Then #>MustInherit <# End If #>Class <#= Sn(Cl_Name) #>
+<# Id(+1) #><# If Hv(Cl_Inherits) Then #>Inherits <#= Cl_Inherits #><# Lf(+1) #><# End If #>
+<# Id(+0) #><# If Hv(Cl_Footer) Then #><#= Cl_Footer #><# Lf(+1) #><# End If #>
+<# Lf(+1) #><# If Cl_Singleton Then #><#= Ct("Patterns", "VB_Singleton.tt", True) #><# Else #><#= Ct("Patterns", "VB_Constructors.tt", True, Cp("Ct_Visibility", "Public")) #><# End If #><# Lf(+1) #>
+<# Id(+0) #><# If Hv(Cl_Body) Then #><# Lf(+1) #><#= Ct("Patterns", "VB_Body.tt", True) #><# Lf(+1) #><# End If #>
+<# Id(+0) #><# If Ln(Cn_Names) > 0 Then #><# Lf(+1) #><#= Ct("Patterns", "VB_Constants.tt", True) #><# Lf(+1) #><# End If #>
+<# Id(+0) #><# If Ln(Va_Names) > 0 Then #><# Lf(+1) #><#= Ct("Patterns", "VB_Variables.tt", True) #><# Lf(+1) #><# End If #>
+<# Id(+0) #><# If Ln(Pr_Names) > 0 Then #><# Lf(+1) #><#= Ct("Patterns", "VB_Properties.tt", True) #><# Lf(+1) #><# End If #>
+<# Id(+0) #><# If Ln(Md_Names) > 0 Then #><# Lf(+1) #><#= Ct("Patterns", "VB_Methods.tt", True) #><# Lf(+1) #><# End If #>
+<# Lf(+1) #>
+<# Id(-1) #>End Class
+<# Id(+0) #><# If Hv(Cl_Namespace) Then #><# Lf(+1) #><# Id(-1) #>End Namespace<# End If #><# CompleteTransform() #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TRANSFORMATION METHODS										'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Protected Sub CompleteTransform()
+
+		Dim mapping_Output As System.Collections.Generic.Dictionary(Of String, String) = Bo("Cl_Mapping", La.VB)
+
+		If Not mapping_Output Is Nothing AndAlso mapping_Output.Count > 0
+
+		For Each mapping_Name As String In mapping_Output.Keys
+
+			Dim mapping_File As String = Nothing
+
+			Dim mapping_Suffix As String = String.Format("{0}", mapping_Name.ToLower)
+
+			If Hv(Cl_Namespace) Then
+				mapping_File = String.Format("{0}.{1}.{2}.xml", Cl_Namespace, Cl_Name, mapping_Suffix)
+			Else
+				mapping_File = String.Format("{0}.{1}.xml", Cl_Name, mapping_Suffix)
+			End If
+
+			mapping_File = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Host.TemplateFile), mapping_File)
+
+			If System.IO.File.Exists(mapping_File) Then System.IO.File.Delete(mapping_File)
+			System.IO.File.WriteAllText(mapping_File, mapping_Output(mapping_Name))
+
+		Next
+
+		End If
+
+	End Sub
+
+	Protected Sub PrepareTransform()
+
+		Dim header_List As New List(Of String)
+		Dim gets_List As New List(Of String)
+		Dim sets_List As New List(Of String)
+
+		For Fd_Current = 0 to Ln(Pr_Names) - 1
+
+			Dim header As String = Be("Pr_Header", La.VB)
+			If Hv(header) Then header = header & Environment.NewLine
+			header_List.Add(header)
+
+			Dim getBuilder As New StringBuilder()
+			If Pr_Readable Then
+
+				Dim behaviour As String = Be("Pr_Get", La.VB)
+				If Hv(behaviour) Then getBuilder.Append(behaviour)
+				getBuilder.Append(String.Format("Return {0}", Va_Name))
+
+			End If
+			gets_List.Add(getBuilder.ToString())
+
+			Dim setBuilder As New StringBuilder()
+			If Pr_Writeable Then
+
+				setBuilder.Append(String.Format("{0} = value", Va_Name))
+				Dim behaviour As String = Be("Pr_Set", La.VB)
+				If Hv(behaviour) Then setBuilder.Append(Environment.NewLine).Append(behaviour)
+
+			End If
+			sets_List.Add(setBuilder.ToString())
+
+		Next
+
+		Fd_Current = 0
+
+		Pr_Headers = header_List.ToArray()
+		Pr_Gets = gets_List.ToArray()
+		Pr_Sets = sets_List.ToArray()
+
+		Cl_Header = Be("Cl_Header", La.VB)
+		Cl_Footer = Be("Cl_Footer", La.VB)
+		Cl_Body = Be("Cl_Body", La.VB)
+
+	End Sub
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

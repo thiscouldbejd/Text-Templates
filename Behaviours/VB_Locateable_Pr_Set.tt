@@ -1,0 +1,9 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# If String.Compare(Pr_Name, Pr_Location, True) = 0 Then #>
+<# Id(+0) #>If Not String.IsNullOrEmpty(<#= Va_Name #>) Then _
+<# Id(+1) #>Caerus.Location.ParseLocation(<#= Va_Name #>, m_ILocateable_Organisation, m_ILocateable_Site, m_ILocateable_Block, m_ILocateable_Room, m_ILocateable_Area)<# Id(-1) #><# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Pr_Location As String									' Location Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

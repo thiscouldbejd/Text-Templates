@@ -1,0 +1,50 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #>#Region " <#= Cn_Visibility #> Constants "
+<# Lf(+1) #>
+<# Id(+1) #><# For i = 0 to Ln(Cn_Names) - 1 #>
+<# Id(+0) #><#= Ct("Patterns", "VB_Constant.tt", True) #>
+<# Lf(+1) #><# Next   #>
+<# Id(-1) #>#End Region<#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INTERNAL VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private i As Integer = 0										' Current Iterative Index
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Cn_Visibility As String = "Public"						' Visibility of the Constants
+	Public Cn_Names As String() = New String() {}					' Names of the Constants (n)
+	Public Cn_Values As String() = New String() {}					' Values of the Constants (v)
+	Public Cn_Descriptions As String() = New String() {}			' Descriptions of the Constants (d)
+	Public Cn_Remarks As String() = New String() {}					' Remarks for the Constants (r)
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Cn_Name() As String
+		Get
+			Return Av(Cn_Names, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Cn_Value() As String
+		Get
+			Return Av(Cn_Values, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Cn_Description() As String
+		Get
+			Return Av(Cn_Descriptions, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Cn_Remark() As String
+		Get
+			Return Av(Cn_Remarks, i)
+		End Get
+	End Property
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

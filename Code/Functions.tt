@@ -1,0 +1,528 @@
+﻿<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Environment" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.IO.Path" #>
+<#@ import namespace="System.Reflection" #>
+<#@ import namespace="System.Runtime.Remoting.Messaging" #>
+<#@ import namespace="System.Runtime.Remoting.Messaging.CallContext" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE CONSTANTS											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Const FUNCTIONS_VERSION As Integer = 1
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property TEMPLATES_PATH As String
+		Get
+			If Not String.IsNullOrEmpty(GetEnvironmentVariable("TEMPLATES_PATH", EnvironmentVariableTarget.User)) Then
+				Return GetEnvironmentVariable("TEMPLATES_PATH", EnvironmentVariableTarget.User)
+			ElseIf Not String.IsNullOrEmpty(GetEnvironmentVariable("TEMPLATES_PATH", EnvironmentVariableTarget.Process)) Then
+				Return GetEnvironmentVariable("TEMPLATES_PATH", EnvironmentVariableTarget.Process)
+			ElseIf Not String.IsNullOrEmpty(GetEnvironmentVariable("TEMPLATES_PATH", EnvironmentVariableTarget.Machine)) Then
+				Return GetEnvironmentVariable("TEMPLATES_PATH", EnvironmentVariableTarget.Machine)
+			Else
+				Return Environment.CurrentDirectory
+			End If
+		End Get
+	End Property
+
+	Public TEMPLATES_FORMAT_PATH As String = TEMPLATES_PATH & "\{0}\{1}"
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE DESCRIPTION											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TOTAL TEMPLATE LENGTH SHOULD BE <=500 lines (Including ALL Comments)
+	' Aa = Aggregate Arrays | Ac = Create Array | Ae = Value Exists in Array | Af = Format Array Strings | Ao = Add Object To Array | Av = Get Array Value
+	' Cd = Create Directive | Co = Comment Prefix | Ca = Create Array Template Parameter | Cp = Create Template Parameter | Ct = Call Template
+	' Dd = DeHydrate Data | Hd = Hydrate Data | Wd = Wedge Data
+	' Ga = Generator Attribute | Gd = Generator Date Tag | Ge = Generator Tag | Gf = Generator Functions Tag
+	' Gs = Generator Source Tag | Gt = Generator Template Tag | Gv = Generator Version Tag
+	' Hv = Has String Value | Id = Indent Output
+	' La = Enum for Output Language | Ln = Get Array Length | Lf = Line-Feed Output
+	' Pt = Parameter Tag | Rt = Remarks Tag
+	' Sn = Safe Member Name | St = Summary Tag
+	' Tp = Entry Template Path
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' PUBLIC CONSTANTS												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Const ANGLE_BRACKET_END As Char = ">", ANGLE_BRACKET_START As Char = "<"
+	Public Const ASTERISK As Char = "*", HASH As Char = "#", BACK_SLASH As Char = "\", FORWARD_SLASH As Char = "/"
+	Public Const BRACE_END As Char = "}", BRACE_START As Char = "{", BRACKET_END As Char = ")", BRACKET_START As Char = "("
+	Public Const COLON As Char = ":", SEMI_COLON As Char = ";", COMMA As Char = ",", FULL_STOP As Char = "."
+	Public Const EXCLAMATION_MARK As Char = "!", QUESTION_MARK As Char = "?", EQUALS_SIGN As Char = "=", PLUS As Char = "+"
+	Public Const HYPHEN As Char = "-", UNDER_SCORE As Char = "_", PERCENTAGE_MARK As Char = "%", AT_SIGN As Char = "@"
+	Public Const PIPE As Char = "|", SPACE As Char = " ", QUOTE_SINGLE As Char = "'", QUOTE_DOUBLE As Char = """"
+	Public Const SQUARE_BRACKET_END As Char = "]", SQUARE_BRACKET_START As Char = "["
+	Public Const INSTRUCTION_START As String = ANGLE_BRACKET_START & HASH, INSTRUCTION_END As String = HASH & ANGLE_BRACKET_END
+	Public Const DECLARATION_START As String = INSTRUCTION_START & AT_SIGN, DECLARATION_END As String = INSTRUCTION_END
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' LANGUAGE ENUMS												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Enum La
+		VB = 1
+		CS = 2
+	End Enum
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' COMMENT FUNCTIONS												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private Function Co( _
+		language As La _
+	) As String
+
+		Select Case language
+			Case La.VB
+				Return QUOTE_SINGLE & QUOTE_SINGLE & QUOTE_SINGLE & SPACE
+			Case La.CS
+				Return FORWARD_SLASH & FORWARD_SLASH & FORWARD_SLASH & SPACE
+			Case Else
+				Return Nothing
+		End Select
+
+	End Function
+
+	Public Function St( _
+		ByVal summary As String, _
+		Optional ByVal language As La = La.VB _
+	) As String
+
+		Return String.Format(Co(language) & "<summary>{0}</summary>", summary)
+
+	End Function
+
+	Public Function Rt( _
+		ByVal remarks As String, _
+		Optional ByVal language As La = La.VB _
+	) As String
+
+		Return String.Format(Co(language) & "<remarks>{0}</remarks>", remarks)
+
+	End Function
+
+	Public Function Ut( _
+		ByVal returns As String, _
+		Optional ByVal language As La = La.VB _
+	) As String
+
+		Return String.Format(Co(language) & "<returns>{0}</returns>", returns)
+
+	End Function
+
+	Public Function Pt( _
+		ByVal name As String, _
+		ByVal description As String, _
+		Optional ByVal language As La = La.VB _
+	) As String
+
+		Return String.Format(Co(language) & "<param name=""{0}"">{1}</param>", name, description)
+
+	End Function
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' GENERATOR FUNCTIONS											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Function Ga( _
+		tool As String, _
+		version As Integer, _
+		Optional ByVal language As La = La.VB _
+	) As String
+
+		Return String.Format("<System.CodeDom.Compiler.GeneratedCode(""{0}"", ""{1}"")> _", tool, version)
+
+	End Function
+
+	Public Function Ge( _
+		Optional ByVal language As La = La.VB _
+	) As String
+
+		Return String.Format(Co(language) & "<autogenerated>{0}</autogenerated>", _
+			"Generated from a T4 template. Modifications will be lost, if applicable use a partial class instead.")
+
+	End Function
+
+	Public Function Gv( _
+		ByVal version As Integer, _
+		Optional ByVal language As La = La.VB _
+	) As String
+
+		Return String.Format(Co(language) & "<generator-version>{0}</generator-version>", version)
+
+	End Function
+
+	Public Function Gf( _
+		Optional ByVal language As La = La.VB _
+	) As String
+
+		Return String.Format(Co(language) & "<generator-functions>{0}</generator-functions>", FUNCTIONS_VERSION)
+
+	End Function
+
+	Public Function Gd( _
+		Optional ByVal language As La = La.VB _
+	) As String
+
+		Return String.Format(Co(language) & "<generator-date>{0}</generator-date>", DateTime.Now().ToString())
+
+	End Function
+
+	Public Function Gs( _
+		Optional ByVal language As La = La.VB _
+	) As String
+
+		Return String.Format(Co(language) & "<generator-source>{0}</generator-source>", Tp)
+
+	End Function
+
+	Public Function Gt( _
+		ByVal templateDirectory As String, _
+		ByVal templateName As String, _
+		Optional ByVal language As La = La.VB _
+	) As String
+
+		Return String.Format(Co(language) & "<generator-template>{0}</generator-template>", String.Format(TEMPLATES_FORMAT_PATH, templateDirectory, templateName))
+
+	End Function
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' FORMATTING METHODS											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private Sub Id( _
+		numberOfTimes as Int32 _
+	)
+
+		Dim i as Int32 = 0
+
+		Do Until i = numberOfTimes
+
+			If numberOfTimes > 0 Then PushIndent(Microsoft.VisualBasic.vbTab) Else PopIndent()
+			If numberOfTimes > 0 Then i += 1 Else i -= 1
+
+		Loop
+
+	End Sub
+
+	Private Sub Lf( _
+		numberOfTimes as Int32 _
+	)
+
+		Dim i as Int32 = 0
+
+		Do Until i = numberOfTimes
+
+			WriteLine(String.Empty)
+			i += 1
+
+		Loop
+
+	End Sub
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INTERNAL METHODS												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Protected Function Tp() As String
+
+		Return Host.TemplateFile()
+
+	End Function
+
+	Protected Function Cd( _
+		templateDirectory As String, _
+		templateName As String _
+	) As String
+
+		Dim directiveBuilder As New System.Text.StringBuilder()
+
+		directiveBuilder.Append(DECLARATION_START).Append(SPACE).Append("include").Append(SPACE).Append("file").Append(EQUALS_SIGN)
+		directiveBuilder.Append(QUOTE_DOUBLE).Append(String.Format(TEMPLATES_FORMAT_PATH, templateDirectory, templateName)).Append(QUOTE_DOUBLE)
+		directiveBuilder.Append(SPACE).Append(DECLARATION_END)
+
+		Return directiveBuilder.ToString()
+
+	End Function
+
+	Private Function Ca(Of T)( _
+		ByVal name As String, _
+		ByVal ParamArray value() As T _
+	) As DictionaryEntry
+
+		Return Cp(name, value)
+
+	End Function
+
+	Protected Function Cp( _
+		ByVal name As String, _
+		ByVal value As Object _
+	) As DictionaryEntry
+
+		Return New DictionaryEntry(name, value)
+
+	End Function
+
+	Protected Function Ct( _
+		ByVal template_Directory As String, _
+		ByVal template_Name As String, _
+		ByVal include_ClassData As Boolean, _
+		ByVal ParamArray parameters As DictionaryEntry() _
+	) As String
+
+		Dim template_Parameters As New List(Of DictionaryEntry)
+		If include_ClassData Then template_Parameters.AddRange(Dd())
+		template_Parameters.AddRange(parameters)
+
+		Dim template_Files As FileInfo() = New FileInfo() {}
+		Dim template_Return As New StringBuilder()
+		Dim guidKey As String = Guid.NewGuid().ToString("N")
+
+		Dim fBuilder As New StringBuilder()
+		fBuilder.Append(Cd("Code", "Functions.tt")).Append(INSTRUCTION_START)
+		fBuilder.Append(String.Format("Hd" & BRACKET_START & QUOTE_DOUBLE & "{0}" & QUOTE_DOUBLE & BRACKET_END, guidKey)).Append(INSTRUCTION_END)
+
+		For Each template_Parameter As DictionaryEntry In template_Parameters
+
+			System.Runtime.Remoting.Messaging.CallContext.LogicalSetData(guidKey & template_Parameter.Key, template_Parameter.Value)
+
+		Next
+
+		If template_Name.Contains(ASTERISK) Then
+
+			template_Files = New System.IO.DirectoryInfo(String.Format(TEMPLATES_FORMAT_PATH, template_Directory, "")).GetFiles(template_Name, SearchOption.AllDirectories)
+
+		Else
+
+			If New FileInfo(String.Format(TEMPLATES_FORMAT_PATH, template_Directory, template_Name)).Exists Then _
+				template_Files = New FileInfo() {New FileInfo(String.Format(TEMPLATES_FORMAT_PATH, template_Directory, template_Name))}
+
+		End If
+
+		For Each template_File As FileInfo In template_Files
+
+			Dim template As String = System.Environment.ExpandEnvironmentVariables(File.ReadAllText(template_File.FullName))
+
+			Dim location As Integer = template.Substring(template.LastIndexOf(HASH & AT_SIGN) + 2) _
+				.IndexOf(ANGLE_BRACKET_END) + template.LastIndexOf(HASH & AT_SIGN) + 3
+
+			template = template.Insert(location, fBuilder.ToString)
+
+			If Host.getHostOption("hasStack") Then Host.getHostOption("stack").AddTemplateCall(template_File.FullName, guidKey, template_Parameters)
+			Dim templateReturn As String = New Engine().ProcessTemplate(template, Host)
+			If Host.getHostOption("hasStack") Then Host.getHostOption("stack").RemoveLastTemplateCall()
+			If templateReturn <> "ErrorGeneratingOutput" Then template_Return.Append(templateReturn)
+
+		Next
+
+		For Each template_Parameter As DictionaryEntry In template_Parameters
+
+			FreeNamedDataSlot(guidKey & template_Parameter.Key)
+
+		Next
+
+		If template_Return.Length > 0 Then Return template_Return.ToString() Else Return Nothing
+
+	End Function
+
+	Protected Function Wd( _
+		value As Object, _
+		toType As System.Type _
+	) As Object
+
+		If toType.IsArray AndAlso value.GetType Is toType.GetElementType Then
+
+			Dim retArray As Array = Array.CreateInstance(toType.GetElementType, 1)
+			retArray(0) = value
+			Return retArray
+
+		End If
+
+		Return value
+
+	End Function
+
+	Protected Sub Hd( _
+		Optional ByVal prefix As String = Nothing _
+	)
+
+		Dim fields As FieldInfo() = Me.GetType().GetFields(BindingFlags.Instance Or BindingFlags.Public)
+
+		For i As Integer = 0 To fields.Length - 1
+
+			Dim objectKey As String = fields(i).Name
+			If Hv(prefix) Then objectKey = prefix & objectKey
+
+			If Not LogicalGetData(objectKey) Is Nothing Then _
+				fields(i).SetValue(Me, Wd(LogicalGetData(objectKey), fields(i).FieldType))
+
+		Next
+
+	End Sub
+
+	Protected Function Dd() As DictionaryEntry()
+
+		Dim params As New List(Of DictionaryEntry)
+
+		Dim fields As FieldInfo() = Me.GetType().GetFields(BindingFlags.Instance Or BindingFlags.Public)
+
+		For i As Integer = 0 To fields.Length - 1
+
+			If Not fields(i).Name = "Host" AndAlso Not fields(i).GetValue(Me) Is Nothing Then params.Add(Cp(fields(i).Name, fields(i).GetValue(Me)))
+
+		Next
+
+		Dim props As PropertyInfo() = Me.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
+
+		For i As Integer = 0 To props.Length - 1
+
+			If props(i).CanRead AndAlso props(i).GetIndexParameters.Length = 0 AndAlso Not props(i).Name = "Host" AndAlso _
+				Not props(i).GetValue(Me, Nothing) Is Nothing Then params.Add(Cp(props(i).Name, props(i).GetValue(Me, Nothing)))
+
+		Next
+
+		Return params.ToArray()
+
+	End Function
+
+	Private Function Ac(Of T)( _
+		ByVal length As Integer, _
+		ByVal value As T _
+	) As T()
+
+		Dim aryObjects As T() = Array.CreateInstance(value.GetType, length)
+		For i As Integer = 0 To length - 1
+			aryObjects(i) = value
+		Next
+		Return aryObjects
+
+	End Function
+
+	Private Function Ae( _
+		ByVal aryObjects As Array, _
+		ByVal value As Object, _
+		Optional ByRef index As Int32 = 0 _
+	) As Boolean
+
+		If Not aryObjects Is Nothing AndAlso aryObjects.Length > 0 Then index = Array.IndexOf(aryObjects, value) Else Return False
+		Return index >= 0
+
+	End Function
+
+	Private Function Av(Of T)( _
+		ByVal aryObjects() As T, _
+		ByVal index As Integer, _
+		Optional ByVal defaultValue As Object = Nothing _
+	) As T
+
+		If Not aryObjects Is Nothing AndAlso aryObjects.Length > index Then Return aryObjects(index) Else Return defaultValue
+
+	End Function
+
+	Private Function Hv( _
+		ByVal value As Object, _
+		ByVal Optional index As Integer = -1 _
+	) As Boolean
+
+		If value Is Nothing Then Return False
+
+		If index >= 0 AndAlso value.GetType() Is GetType(String).MakeArrayType() Then
+			Return Ln(value) > index AndAlso Not String.IsNullOrEmpty(value(index))
+		ElseIf index <= 0
+			Return Not String.IsNullOrEmpty(value)
+		Else
+			Return False
+		End If
+
+	End Function
+
+	Private Function Ln( _
+		ByVal aryObjects As Array _
+	) As Integer
+
+		If aryObjects Is Nothing Then Return 0 Else Return aryObjects.Length
+
+	End Function
+
+	Private Function Aa(Of T)( _
+		ByVal ParamArray aryObjects()() As T _
+	) As T()
+
+		Dim lstTarget As New List(Of T)
+
+		For i As Integer = 0 To aryObjects.Length - 1
+			lstTarget.AddRange(aryObjects(i))
+		Next
+
+		Return lstTarget.ToArray
+
+	End Function
+
+	Private Sub Ao(Of T)( _
+		ByRef aryObjects() As T, _
+		ByVal objectToAdd As Object _
+	)
+
+		If aryObjects Is Nothing Then aryObjects = Array.CreateInstance(GetType(T), 0)
+
+		Dim aryNewObjects As Array = System.Array.CreateInstance(GetType(T), aryObjects.Length + 1)
+
+		aryObjects.CopyTo(aryNewObjects, 0)
+		aryNewObjects(aryNewObjects.Length - 1) = objectToAdd
+
+		aryObjects = aryNewObjects
+
+	End Sub
+
+	Private Function Af( _
+		ByVal arySource As String(), _
+		Optional ByVal format As String = "{0}" _
+	) As String()
+
+		Dim aryTarget(Ln(arySource) - 1) As String
+
+		For i As Integer = 0 to Ln(arySource) - 1
+			If format.IndexOf("{0:U}") >= 0 Then
+				aryTarget(i) = String.Format(format.Replace("{0:U}", "{0}"), arySource(i).ToUpper)
+			ElseIf format.IndexOf("{0:L}") >=0 Then
+				aryTarget(i) = String.Format(format.Replace("{0:L}", "{0}"), arySource(i).ToUpper)
+			Else
+				aryTarget(i) = String.Format(format, arySource(i))
+			End If
+		Next
+
+		Return aryTarget
+
+	End Function
+
+	Protected Function Sn( _
+		ByVal member_Name As String _
+	) As String
+
+		Dim unsafe_Names As String() = New String() _
+			{"Function", "Alias", "Method", "Property", "Variable", "Single", "String", "Double", "Integer", "Long", _
+				"Short", "Module", "Class", "Static", "Boolean", "End", "Date", "ReadOnly", "WriteOnly", "Private", _
+				"Protected", "Friend", "Public", "Implements", "Namespace", "Error", "Nothing", "Select", "Exit", _
+				"Like", "In", "And", "Or", "Operator", "Object", "New", "To", "Return", "Stop", "Option", "Imports", _
+				"Default", "Event", "On", "Type", "Next"}
+
+		For i As Integer = 0 to unsafe_Names.Length - 1
+
+			If String.Compare(member_Name, unsafe_Names(i), True) = 0 Then _
+				Return SQUARE_BRACKET_START & member_Name & SQUARE_BRACKET_END
+
+		Next
+
+		Return member_Name
+
+	End Function
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

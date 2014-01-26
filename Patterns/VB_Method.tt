@@ -1,0 +1,60 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #><#= St(Md_Description) #>
+<# Id(+0) #><#= Rt(Md_Remark) #>
+<# Id(+0) #><#= Md_Visibility #> <# If Md_Override Then #>Overrides <# End If #><# If Md_Overridable Then #>Overridable <# End If #><# If Md_Function Then #>Function <# Else #>Sub <# End If #><#= Sn(Md_Name) #>(<# If Not Md_Parametered Then #>)<# If Md_Function Then #> As <#= Md_ReturnType #><# End If #><# If Hv(Md_Implement) Then #> Implements <#= Md_Implement #><# End If #><# Else #> _<# End If #>
+<# Id(+0) #><# If Md_Parametered Then #><# Id(+1) #><# Lf(+1) #><# For i = 0 to Ln(Md_ParameterNames) - 1 #>
+<# Id(+0) #>ByVal <#= Md_ParameterName #> As <#= Md_ParameterType #><# If i < Ln(Md_ParameterNames) - 1 Then #>,<# End If #> _
+<# Id(+0) #><# Next #>
+<# Id(-1) #>)<# If Md_Function Then #> As <#= Md_ReturnType #><# End If #><# If Hv(Md_Implement) Then #> Implements <#= Md_Implement #><# End If #><# End If #>
+<# Lf(+1) #>
+<# Id(+1) #><#= Md_Body #>
+<# Id(-1) #>End <# If Md_Function Then #>Function<# Else #>Sub<# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INTERNAL VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private i As Integer = 0										' Current Iterative Index
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Md_Visibility As String									' Visibility of the Method
+	Public Md_Name As String										' Name of the Method (n)
+	Public Md_ReturnType As String									' Return Type of the Method (t)
+	Public Md_Body As String										' Body of the Method (b)
+	Public Md_Description As String									' Description of the Method (d)
+	Public Md_Remark As String										' Remark for the Method (r)
+	Public Md_ParameterNames As String() = New String() {}			' Parameter Names for the Method (p)
+	Public Md_ParameterTypes As String() = New String() {}			' Parameter Types for the Method (q)
+	Public Md_Override As Boolean									' Override of the Method (o)
+	Public Md_Overridable As Boolean								' Overridable of the Method (s)
+	Public Md_Implement As String									' Implement of the Method (i)
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Md_Function() As Boolean
+		Get
+			Return Not String.IsNullOrEmpty(Md_ReturnType)
+		End Get
+	End Property
+
+	Public ReadOnly Property Md_Parametered() As Boolean
+		Get
+			Return Ln(Md_ParameterNames) > 0
+		End Get
+	End Property
+
+	Public ReadOnly Property Md_ParameterName() As String
+		Get
+			Return Av(Md_ParameterNames, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Md_ParameterType() As String
+		Get
+			Return Av(Md_ParameterTypes, i, "System.Object")
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

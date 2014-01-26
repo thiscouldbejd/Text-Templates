@@ -1,0 +1,12 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Events.tt" #>
+<# Id(+0) #>#Region " <#= Ev_Visibility #> Events "
+<# Lf(+1) #>
+<# Id(+1) #><# For Ev_Current = 0 to Ln(Ev_Names) - 1 #>
+<# Id(+0) #><#= Ct("Patterns", "VB_Event.tt", True) #>
+<# Lf(+1) #><# Next   #>
+<# Id(-1) #>#End Region<#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Ev_Visibility As String = "Public"						' Visibility of the Events
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

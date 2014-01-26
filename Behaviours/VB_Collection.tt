@@ -1,0 +1,6 @@
+﻿<#+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Cl_Name As String										' Name of the Collection
+	Public Cl_ElementType As String									' Element Type of the Collection
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

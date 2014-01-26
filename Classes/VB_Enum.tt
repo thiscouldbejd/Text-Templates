@@ -1,0 +1,35 @@
+﻿<#@ template language="VB" debug="True" hostspecific="True" culture="en-GB" #><#@ output extension=".vb" #>
+<#@ include file="%TEMPLATES_PATH%\Code\Functions.tt" #>
+<#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #>
+<#@ include file="%TEMPLATES_PATH%\Definitions\Enum.tt" #>
+<#@ include file="%TEMPLATES_PATH%\Definitions\Behaviours.tt" #><# PrepareTransform() #>
+<# If Not String.IsNullOrEmpty(Cl_Namespace) Then #>Namespace <#= Cl_Namespace #><# Lf(+2) #><# Id(+1) #><# End If #>
+<# Id(+0) #><#= St(Cl_Description) #>
+<# Id(+0) #><#= Ge() #><# Lf(+1) #><#= Gd() #><# Lf(+1) #><#= Gf() #><# Lf(+1) #><#= Gs() #><# Lf(+1) #><#= Gv(1) #>
+<# Id(+0) #><# If Cl_Generated Then #><#= Ga(Tp(), 1) #><# Lf(+1) #><# End If #>
+<# Id(+0) #><# If Hv(Cl_Header) Then #><#= Cl_Header #><# Lf(+1) #><# End If #>
+<# Id(+0) #><# If En_Bitwise Then #><Flags()> _<# Lf(+1) #><# End If #>
+<# Id(+0) #><#= Cl_Visibility #> Enum <#= Sn(Cl_Name) #> As <#= En_Type #>
+<# Lf(+1) #>
+<# Id(+1) #><# For En_Current = 0 to Ln(En_Names) - 1 #>
+<# Id(+0) #><#= St(En_Description) #>
+<# Id(+0) #><#= Sn(En_Name) #> = <#= En_Value #>
+<# Lf(+1) #><# Next #>
+<# Id(+0) #><# If En_Bitwise Then #>
+<# Id(+0) #><#= St("All Flags") #>
+<# Id(+0) #><# For En_Current = 0 to Ln(En_Names) - 1 #>
+<# Id(+0) #><# If En_Current = 0 Then #>All = <# ElseIf En_Current = 1 Then #><# Id(+1) #><# End If #><#= Sn(En_Name) #><# If En_Current < Ln(En_Names) - 1 Then #> Or _<# End If #>
+<# Lf(+1) #><# Next #>
+<# Id(-1) #>
+<# Lf(+1) #><# End If #>
+<# Id(-1) #>End Enum
+<# Id(+0) #><# If Not String.IsNullOrEmpty(Cl_Namespace) Then #><# Lf(+1) #><# Id(-1) #>End Namespace<# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' OVERRIDING METHODS											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Protected Sub PrepareTransform()
+
+		Cl_Header = Be("Cl_Header", La.VB)
+
+	End Sub
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

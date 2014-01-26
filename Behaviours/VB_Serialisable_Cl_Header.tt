@@ -1,0 +1,3 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Behaviours\VB_Serialisable.tt" #>
+<# If Hv(Cl_XmlNamespace) Then #><System.Xml.Serialization.XmlType(Namespace:="<#= Cl_XmlNamespace #>")> _<# Lf(+1) #><# End If #>
+<# Id(+0) #><System.Serializable()> _

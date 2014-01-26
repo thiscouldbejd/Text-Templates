@@ -1,0 +1,21 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #><# GenerateBody() #>
+<# Id(+0) #>#Region " Hashable Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Methods.tt", False, Cp("Md_Visibility", "Public"), Ca("Md_Names", "GetHashCode"), Ca("Md_ReturnTypes", "System.Int32"), _
+	Ca("Md_Bodies", Md_Body), Ca("Md_Descriptions", "Method to Generate a HashCode"), Ca("Md_Overrides", True)) #>
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Md_Body As String										'
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' 
+	Private Sub GenerateBody()
+		Dim body_Builder As New System.Text.StringBuilder()
+		body_Builder.Append("Return Leviathan.Caching.Simple.CombineHashCodes(").Append(String.Format("GetType({0})", Cl_Name))
+		For Fd_Current = 0 To Ln(Pr_Names) - 1
+			body_Builder.Append(String.Format(", {0}", Sn(Pr_Name)))
+		Next
+		body_Builder.Append(")")
+		Md_Body = body_Builder.ToString()
+	End Sub #>

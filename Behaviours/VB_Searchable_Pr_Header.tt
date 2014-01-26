@@ -1,0 +1,8 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# If Ae(Pr_Searchable, Pr_Name) Then #>
+<# Id(+0) #><Izorian.Persistance.Searchable()> _<# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Pr_Searchable As String()								' Names of Searchable Properties
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

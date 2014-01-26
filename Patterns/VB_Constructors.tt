@@ -1,0 +1,43 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# Id(+0) #>#Region " <#= Ct_Visibility #> Constructors "
+<# Lf(+1) #>
+<# Id(+1) #><# If Cl_DefaultConstructor Then #>
+<# Id(+0) #><#= St("Default Constructor") #>
+<# Id(+0) #><#= Ct_Visibility #> Sub New()
+<# Lf(+1) #>
+<# Id(+1) #>MyBase.New()
+<# Lf(+1) #>
+<# Id(+0) #><# For Fd_Current = 0 to Ln(Fd_Names) - 1 #>
+<# Id(+0) #><# If Hv(Fd_Default) Then #>
+<# Id(+0) #><# If Fd_Default = "NEW" Then #><#= Va_Name #> = New <#= Fd_Type #><# If Fd_Type.EndsWith("()") Then #> {}<# End If #><# Else #><#= Va_Name #> = <# If Fd_Type.EndsWith("String") AndAlso Fd_Default <> "String.Empty" AndAlso Not Fd_Default.StartsWith("##") Then #><#= String.Format("""{0}""", Fd_Default) #><# Else #><#= Fd_Default.TrimStart("##") #><# End If #><# End If #>
+<# Lf(+1) #><# End If #>
+<# Id(+0) #><# Next   #><# If Hv(Cl_PostConstructionCall) Then #><#= Cl_PostConstructionCall #><# Lf(+2) #><# End If #>
+<# Id(-1) #>End Sub
+<# Id(+0) #><# Lf(+1) #><# End If #>
+<# Id(+0) #><# For i As Integer = 0 to Ln(Fd_Names) - 1 #>
+<# Id(+0) #><#= St(String.Format("Parametered Constructor ({0} Parameters)", i + 1)) #>
+<# Id(+0) #><#= Ct_Visibility #> Sub New( _
+<# Id(+1) #><# For Fd_Current = 0 to i #>
+<# Id(+0) #>ByVal <#= Pa_Name #> As <#= Fd_Type #><# If Fd_Current < i Then #>,<# End If #> _<# Lf(+1) #>
+<# Id(+0) #><# Next   #>
+<# Id(-1) #>)
+<# Lf(+1) #>
+<# Id(+1) #>MyBase.New()
+<# Lf(+1) #>
+<# Id(+0) #><# For Fd_Current = 0 to i #>
+<# Id(+0) #><#= Sn(Fd_Set) #> = <#= Pa_Name #>
+<# Id(+0) #><# Next   #>
+<# Lf(+1) #>
+<# Id(+0) #><# For Fd_Current = i + 1 to Ln(Fd_Names) - 1 #>
+<# Id(+0) #><# If Hv(Fd_Default) Then #>
+<# Id(+0) #><# If Fd_Default = "NEW" Then #><#= Va_Name #> = New <#= Fd_Type #><# If Fd_Type.EndsWith("()") Then #> {}<# End If #><# Else #><#= Va_Name #> = <# If Fd_Type.EndsWith("String") AndAlso Fd_Default <> "String.Empty" AndAlso Not Fd_Default.StartsWith("##") Then #><#= String.Format("""{0}""", Fd_Default) #><# Else #><#= Fd_Default.TrimStart("##") #><# End If #><# End If #>
+<# Lf(+1) #><# End If #>
+<# Id(+0) #><# Next   #><# If Hv(Cl_PostConstructionCall) Then #><#= Cl_PostConstructionCall #><# Lf(+2) #><# End If #>
+<# Id(-1) #>End Sub
+<# Lf(+1) #><# Next   #>
+<# Id(-1) #>#End Region<#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Ct_Visibility As String = "Public"						' Visibility of the Constructors
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

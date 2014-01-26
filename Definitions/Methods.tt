@@ -1,0 +1,104 @@
+﻿<#+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Md_Current As Integer = 0								' Used to Track the 'Current' Method
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' METHOD VARIABLES												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Md_Descriptions As String()								' Descriptions of the Methods (d)
+	Public Md_Bodies As String()									' Bodies of the Methods (b)
+	Public Md_Names As String()										' Names of the Methods (n)
+	Public Md_ReturnTypes As String()								' Return Types of the Methods (r)
+	Public Md_ParametersNames As String()()							' Parameter Names of the Methods (p)
+	Public Md_ParametersTypes As String()()							' Parameter Types of the Methods (q)
+	Public Md_Overrides As Boolean()								' Overrides of the Methods (o)
+	Public Md_Overridables As Boolean()								' Overridables of the Methods (s)
+	Public Md_Implements As String()								' Implements of the Methods (i)
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' 
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' FIELD PROPERTIES												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Md_Description As String				' Description of the Current Method
+		Get
+			Return Av(Md_Descriptions, Md_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property Md_Body As String						' Body of the Current Method
+		Get
+			Return Av(Md_Bodies, Md_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property Md_Name As String						' Name of the Current Method
+		Get
+			Return Av(Md_Names, Md_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property Md_ReturnType As String				' Return Type of the Current Method
+		Get
+			Return Av(Md_ReturnTypes, Md_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property Md_ParameterNames As String()			' Parameter Names of the Current Method
+		Get
+			Return Av(Md_ParametersNames, Md_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property Md_ParameterTypes As String()			' Parameter Types of the Current Method
+		Get
+			Return Av(Md_ParametersTypes, Md_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property Md_Override As Boolean					' Whether the Current Method Overrides
+		Get
+			Return Av(Md_Overrides, Md_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property Md_Overridable As Boolean				' Whether the Current Method is Overridable
+		Get
+			Return Av(Md_Overridables, Md_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property Md_Implement As String					' Implements of the Current Method
+		Get
+			Return Av(Md_Implements, Md_Current)
+		End Get
+	End Property
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' ADDITION METHODS												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Sub Add_Method( _
+		Optional ByVal b As String = Nothing, _
+		Optional ByVal d As String = Nothing, _
+		Optional ByVal i As String = Nothing, _
+		Optional ByVal n As String = Nothing, _
+		Optional ByVal o As Boolean = False, _
+		Optional ByVal p As String() = Nothing, _
+		Optional ByVal q As String() = Nothing, _
+		Optional ByVal r As String = Nothing, _
+		Optional ByVal s As Boolean = False _
+	)																' Method to Add a Method
+
+		Ao(Md_Bodies, b)
+		Ao(Md_Descriptions, d)
+		Ao(Md_Implements, i)
+		Ao(Md_Names, n)
+		Ao(Md_Overrides, o)
+		Ao(Md_ParametersNames, p)
+		Ao(Md_ReturnTypes, r)
+		Ao(Md_Overridables, s)
+		Ao(Md_ParametersTypes, q)
+
+	End Sub #>

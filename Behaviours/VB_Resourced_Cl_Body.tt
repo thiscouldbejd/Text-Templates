@@ -1,0 +1,59 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #>#Region " Resourced Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Constants.tt", False, Cp("Cn_Visibility", "Public"), _
+	Ca("Cn_Names", "RESOURCE_PREFIX", "RESOURCE_SUFFIX"), _
+	Ca("Cn_Types", "System.String", "System.String"), Ca("Cn_Values", "@", "@")) #>
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Private Properties "
+<# Lf(+1) #>
+<# Id(+1) #>Private ReadOnly Property ResourceContainingAssembly() As System.Reflection.Assembly
+<# Id(+1) #>Get
+<# Id(+1) #>If ResourceContainingType Is Nothing Then
+<# Lf(+1) #>
+<# Id(+1) #>If Not System.Reflection.Assembly.GetEntryAssembly Is Nothing Then
+<# Lf(+1) #>
+<# Id(+1) #>Return System.Reflection.Assembly.GetEntryAssembly
+<# Lf(+1) #>
+<# Id(-1) #>Else
+<# Lf(+1) #>
+<# Id(+1) #>Return System.Reflection.Assembly.GetExecutingAssembly
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>Else
+<# Lf(+1) #>
+<# Id(+1) #>Return ResourceContainingType.Assembly
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Id(+0) #>
+<# Id(-1) #>End Get
+<# Id(-1) #>End Property
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Protected Methods "
+<# Lf(+1) #>
+<# Id(+1) #>Protected Function GetResourcedValue( _
+<# Id(+1) #>ByVal value As String _
+<# Id(-1) #>) As String
+<# Lf(+1) #>
+<# Id(+1) #>If Not String.IsNullOrEmpty(value) AndAlso value.StartsWith(RESOURCE_PREFIX) AndAlso _
+<# Id(+1) #>value.EndsWith(RESOURCE_SUFFIX) Then
+<# Lf(+1) #>
+<# Id(+0) #>Return Resources.SingleResource( _
+<# Id(+1) #>ResourceContainingAssembly, ResourceName, _
+<# Id(+0) #>value.Substring(RESOURCE_PREFIX.Length, value.Length - _
+<# Id(+0) #>(RESOURCE_PREFIX.Length + RESOURCE_SUFFIX.Length)))
+<# Lf(+1) #>
+<# Id(-2) #>Else
+<# Lf(+1) #>
+<# Id(+1) #>Return value
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #>

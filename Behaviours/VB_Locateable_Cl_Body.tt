@@ -1,0 +1,16 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #>#Region " ILocateable Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Variables.tt", False, Ca("Va_Names", "m_ILocateable_Organisation", "m_ILocateable_Site", _
+	"m_ILocateable_Block", "m_ILocateable_Room", "m_ILocateable_Area"), _
+	Ca("Va_Types", Ac(5, "System.String"))) #>
+<# Lf(+1) #>
+<# Id(+0) #><#= Ct("Patterns", "VB_Properties.tt", False, Ca("Pr_Names", "ILocateable_Organisation", _
+	"ILocateable_Site", "ILocateable_Block", "ILocateable_Room", "ILocateable_Area"), _
+	Ca("Pr_Types", Ac(5, "System.String")), _
+	Ca("Pr_Gets", "Return m_ILocateable_Organisation", "Return m_ILocateable_Site", _
+	"Return m_ILocateable_Block", "Return m_ILocateable_Room", "Return m_ILocateable_Area"), _
+	Ca("Pr_Implements", "Caerus.ILocateable.Organisation", "Caerus.ILocateable.Site", "Caerus.ILocateable.Block", _
+	"Caerus.ILocateable.Room", "Caerus.ILocateable.Area")) #>
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #>

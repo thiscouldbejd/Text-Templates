@@ -1,0 +1,1288 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #><# If Hv(Db_View) Then #>
+<# Id(+0) #>#Region " DbRetrievable Implementation "
+<# Lf(+1) #>
+<# Id(+1) #>#Region " Protected Methods "
+<# Lf(+1) #>
+<# Id(+1) #><#= St("This method should be overridden to provide custom validation logic.") #>
+<# Id(+0) #>Protected Overridable Function DbRetrievable_ValidateForSet() As Boolean
+<# Lf(+1) #>
+<# Id(+1) #>Return True
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #>Public Class All
+<# Id(+1) #>Implements System.Collections.Generic.IEnumerable(Of <#= Sn(Cl_Name) #>)
+<# Id(+0) #>Implements System.Collections.Generic.IEnumerator(Of <#= Sn(Cl_Name) #>)
+<# Id(+0) #>Implements System.ComponentModel.ITypedList
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Public Enums "<# Dim enum_Value As Integer = 1 #>
+<# Lf(+2) #>
+<# Id(+1) #><Flags()> _
+<# Id(+0) #>Public Enum Filters As System.Int64
+<# Lf(+1) #>
+<# Id(+1) #><# For Fd_Current = 0 To Ln(Fd_Names) - 1 #><# If Hv(Fd_Mapping(P_DB_FIELD), 0) Then #><# If enum_Value > 1 Then #><# Lf(+1) #><# End If #>
+<# Id(+0) #><#= Sn(Fd_Name).ToUpper() #> = <#= enum_Value #><# enum_Value = enum_Value * 2 #>
+<# Id(+0) #><# End If #><# Next #>
+<# Lf(+2) #>
+<# Id(-1) #>End Enum
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #><#= Ct("Patterns", "VB_Variables.tt", False, Cp("Va_Names", Fd_IndexVariables), Cp("Va_Types", Ac(Ln(Fd_IndexVariables), "System.Int32")), Cp("Va_Defaults", Ac(Ln(Fd_IndexVariables), "-1"))) #>
+<# Lf(+1) #>
+<# Id(+0) #><#= Ct("Patterns", "VB_Variables.tt", False, Cp("Va_Visibility", "Protected"), _
+Cp("Va_Names", New String() {"Cmd", "Rdr", "Cur", "Ini", "Idx", "Own"}), _
+Cp("Va_Types", New String() {"System.Data.IDbCommand", "System.Data.IDataReader", Sn(Cl_Name), "System.Boolean", "System.Int32", "System.Int32"}), _
+Cp("Va_Defaults", New String() {"", "", "", "", "", "System.Threading.Thread.CurrentThread.ManagedThreadId"})) #>
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Protected Methods "
+<# Lf(+1) #>
+<# Id(+1) #>Protected Function Hydrate( _
+<# Id(+1) #>ByVal reader As System.Data.IDataReader _
+<# Id(-1) #>) As <#= Sn(Cl_Name) #>
+<# Lf(+1) #>
+<# Id(+1) #>Return Hydrate(New <#= Sn(Cl_Name) #>(), reader)
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Protected Function Hydrate( _
+<# Id(+1) #>ByRef value As <#= Sn(Cl_Name) #>, _
+<# Id(+0) #>ByVal reader As System.Data.IDataReader _
+<# Id(-1) #>) As <#= Sn(Cl_Name) #>
+<# Lf(+1) #>
+<# Id(+1) #><# For i As Integer = 0 to Ln(Fd_IndexVariables) - 1 #>
+<# Id(+0) #><# Dim field_IndexType As String = Fd_IndexTypes(i) #>
+<# Id(+0) #>If <# If Db_Loose Then #><#= Fd_IndexVariables(i) #> >= 0 AndAlso <# End If #>Not reader.IsDBNull(<#= Fd_IndexVariables(i) #>) Then<# If field_IndexType <> "System.Byte()" AndAlso field_IndexType <> "Byte()" Then #> _<# End If #>
+<# Lf(+1) #><# If field_IndexType.Contains("Nullable(Of") Then field_IndexType = field_IndexType.Substring(field_IndexType.IndexOf("(Of ") + 4).TrimEnd(")")  #>
+<# Id(+0) #><# If field_IndexType = "Single" Or field_IndexType = "System.Single" Then field_IndexType = "System.Float"  #>
+<# Id(+0) #><# If field_IndexType = "System.Byte()" OrElse field_IndexType = "Byte()" Then #>
+<# Id(+1) #>Dim <#= Fd_IndexVariables(i) #>_S As System.Int64 = reader.GetBytes(<#= Fd_IndexVariables(i) #>, 0, Nothing, 0, 0)
+<# Id(+0) #>value.<#= Fd_IndexSets(i) #> = New System.Byte(<#= Fd_IndexVariables(i) #>_S - 1) {}
+<# Id(+0) #>Dim <#= Fd_IndexVariables(i) #>_B As Integer = 1024
+<# Id(+0) #>Dim <#= Fd_IndexVariables(i) #>_R As Long = 0
+<# Id(+0) #>Dim <#= Fd_IndexVariables(i) #>_P As Integer = 0
+<# Lf(+1) #>
+<# Id(+0) #>While (<#= Fd_IndexVariables(i) #>_R < <#= Fd_IndexVariables(i) #>_S)
+<# Lf(+1) #>
+<# Id(+1) #>If (<#= Fd_IndexVariables(i) #>_S - <#= Fd_IndexVariables(i) #>_R < <#= Fd_IndexVariables(i) #>_B) Then
+<# Id(+1) #><#= Fd_IndexVariables(i) #>_B = <#= Fd_IndexVariables(i) #>_S - <#= Fd_IndexVariables(i) #>_R
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #><#= Fd_IndexVariables(i) #>_R += reader.GetBytes(<#= Fd_IndexVariables(i) #>, <#= Fd_IndexVariables(i) #>_P, value.<#= Fd_IndexSets(i) #>, <#= Fd_IndexVariables(i) #>_P, <#= Fd_IndexVariables(i) #>_B)
+<# Id(+0) #><#= Fd_IndexVariables(i) #>_P += <#= Fd_IndexVariables(i) #>_B
+<# Lf(+1) #>
+<# Id(-1) #>End While
+<# Lf(+1) #>
+<# Id(-1) #>End If<# Id(+1) #><# Else #>
+<# Id(+1) #>value.<#= Fd_IndexSets(i) #> = <# If field_IndexType.StartsWith("System.") Then #>reader.Get<#= field_IndexType.Substring(field_IndexType.LastIndexOf(".") + 1).TrimEnd(")") #>(<#= Fd_IndexVariables(i) #>)<# Else #>CType(reader.GetValue(<#= Fd_IndexVariables(i) #>), <#= field_IndexType #>)<# End If #>
+<# Id(+0) #><# End If #>
+<# Lf(+1) #>
+<# Id(-1) #><# Next #>
+<# Id(+0) #>Return value
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Public Constructors "
+<# Lf(+1) #>
+<# Id(+1) #>Public Sub New( _
+<# Id(+1) #>ByVal _cmd As System.Data.IDbCommand _
+<# Id(-1) #>)
+<# Lf(+1) #>
+<# Id(+1) #>MyBase.New()
+<# Lf(+1) #>
+<# Id(+0) #>Cmd = _cmd
+<# Lf(+1) #>
+<# Id(-1) #>End Sub
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #>#Region " IEnumerator Implementation "
+<# Lf(+1) #>
+<# Id(+1) #>Private ReadOnly Property GetCurrent_UnTyped() As Object Implements IEnumerator.Current
+<# Id(+1) #>Get
+<# Id(+1) #>Return Cur
+<# Id(-1) #>End Get
+<# Id(-1) #>End Property
+<# Lf(+1) #>
+<# Id(+0) #>Private ReadOnly Property GetCurrent_Typed() As <#= Sn(Cl_Name) #> Implements IEnumerator(Of <#= Sn(Cl_Name) #>).Current
+<# Id(+1) #>Get
+<# Id(+1) #>Return Cur
+<# Id(-1) #>End Get
+<# Id(-1) #>End Property
+<# Lf(+1) #>
+<# Id(+0) #>Private Function MoveNext() As Boolean Implements IEnumerator(Of <#= Sn(Cl_Name) #>).MoveNext
+<# Lf(+1) #>
+<# Id(+1) #>If Not Ini Then Reset()
+<# Id(+0) #>If Rdr.Read() Then
+<# Id(+1) #>Cur = Hydrate(Rdr)
+<# Id(+0) #>Idx += 1
+<# Id(+0) #>Return True
+<# Id(-1) #>Else
+<# Id(+1) #>Cur = Nothing
+<# Id(+0) #>Return False
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Private Sub Reset() Implements IEnumerator(Of <#= Sn(Cl_Name) #>).Reset
+<# Lf(+1) #>
+<# Id(+1) #>If Not Rdr Is Nothing Then Rdr.Close()
+<# Id(+0) #>If Cmd.Connection.State = System.Data.ConnectionState.Closed Then Cmd.Connection.Open()
+<# Id(+0) #>Rdr = Cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection)
+<# Id(+0) #>Idx = -1
+<# Id(+0) #><# If Db_Loose Then #>
+<# Lf(+1) #>
+<# Id(+0) #>For i As Integer = 0 To rdr.FieldCount - 1
+<# Lf(+1) #>
+<# Id(+1) #><# For i As Integer = 0 to Ln(Fd_IndexVariables) - 1 #>
+<# Id(+0) #><# If i > 0 Then #>Else<# End If #>If <#= Fd_IndexVariables(i) #> < 0 AndAlso String.Compare(rdr.GetName(i), "<#= Fd_IndexFields(i) #>", StringComparison.OrdinalIgnoreCase) = 0 Then
+<# Id(+1) #><#= Fd_IndexVariables(i) #> = i<# Id(-1) #>
+<# Lf(+1) #>
+<# Id(+0) #><# Next #>
+<# Id(+0) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>Next
+<# Lf(+1) #><# Else #>
+<# Lf(+1) #><# For i As Integer = 0 to Ln(Fd_IndexVariables) - 1 #>
+<# Id(+0) #><#= Fd_IndexVariables(i) #> = rdr.GetOrdinal("<#= Fd_IndexFields(i) #>")
+<# Id(+0) #>If <#= Fd_IndexVariables(i) #> < 0 Then Throw New Exception("Mapping For Field Not Correct: <#= Fd_IndexFields(i) #>")
+<# Lf(+1) #><# Next #>
+<# Id(+0) #><# End If #>
+<# Id(+0) #>Ini = True
+<# Lf(+1) #>
+<# Id(-1) #>End Sub
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #>#Region " IEnumerable Implementation "
+<# Lf(+1) #>
+<# Id(+1) #>Private Function GetEnumerator_UnTyped As IEnumerator Implements IEnumerable.GetEnumerator
+<# Lf(+1) #>
+<# Id(+1) #>Return GetEnumerator()
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Private Function GetEnumerator As IEnumerator(Of <#= Sn(Cl_Name) #>) Implements IEnumerable(Of <#= Sn(Cl_Name) #>).GetEnumerator
+<# Lf(+1) #>
+<# Id(+1) #>If System.Threading.Thread.CurrentThread.ManagedThreadId = Own AndAlso Idx = -1 Then
+<# Id(+1) #>Return Me
+<# Id(-1) #>Else
+<# Id(+1) #>Return New All(Cmd)
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #>#Region " IDisposable Implementation "
+<# Lf(+1) #>
+<# Id(+1) #>Private Sub Dispose() Implements IEnumerator(Of <#= Sn(Cl_Name) #>).Dispose
+<# Lf(+1) #>
+<# Id(+1) #>If Not Rdr Is Nothing Then Rdr.Close()
+<# Lf(+1) #>
+<# Id(-1) #>End Sub
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #>#Region " ITypedList Implementation "
+<# Lf(+1) #>
+<# Id(+1) #>Public Function GetItemProperties( _
+<# Id(+1) #>ByVal listAccessors() As System.ComponentModel.PropertyDescriptor _
+<# Id(-1) #>) As System.ComponentModel.PropertyDescriptorCollection _
+<# Id(+0) #>Implements System.ComponentModel.ITypedList.GetItemProperties
+<# Lf(+1) #>
+<# Id(+1) #>Return System.ComponentModel.TypeDescriptor.GetProperties(GetType(<#= Sn(Cl_Name) #>))
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Function GetListName( _
+<# Id(+1) #>ByVal listAccessors() As System.ComponentModel.PropertyDescriptor _
+<# Id(-1) #>) As String _
+<# Id(+0) #>Implements System.ComponentModel.ITypedList.GetListName
+<# Lf(+1) #>
+<# Id(+1) #>Return "Enumerable Collection of <#= Sn(Cl_Name) #>"
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Public Shared Select Methods "
+<# Lf(+1) #>
+<# Id(+1) #>Protected Friend Shared Function [Select]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByVal query As String _
+<# Id(-1) #>) As IEnumerable(Of <#= Sn(Cl_Name) #>)
+<# Lf(+1) #>
+<# Id(+1) #>Return [Select](connection, query, _
+<# Id(+1) #>CType(Nothing, System.Collections.Generic.KeyValuePair(Of System.String, System.Object)()))
+<# Lf(+1) #>
+<# Id(-2) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Protected Friend Shared Function [Select]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByVal query As String, _
+<# Id(+0) #>ByVal ParamArray parameters As System.Collections.Generic.KeyValuePair(Of System.String, System.Object)() _
+<# Id(-1) #>) As IEnumerable(Of <#= Sn(Cl_Name) #>)
+<# Lf(+1) #>
+<# Id(+1) #>Dim command As System.Data.IDbCommand = connection.CreateCommand()
+<# Id(+0) #>If query.IndexOf(" ") > 0 Then command.CommandType = System.Data.CommandType.Text Else command.CommandType = System.Data.CommandType.StoredProcedure
+<# Id(+0) #>command.CommandText = query
+<# Lf(+1) #>
+<# Id(+1) #>If Not parameters Is Nothing Then
+<# Lf(+1) #>
+<# Id(+1) #>For i As Integer = 0 To parameters.Length - 1
+<# Lf(+1) #>
+<# Id(+1) #>Dim param As System.Data.IDbDataParameter = command.CreateParameter()
+<# Id(+0) #>param.ParameterName = parameters(i).Key
+<# Id(+0) #>param.Value = parameters(i).Value
+<# Id(+0) #>command.Parameters.Add(param)
+<# Lf(+1) #>
+<# Id(-1) #>Next
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #>Return New All(command)
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Protected Friend Shared Function [Select]( _
+<# Id(+1) #>ByVal command As System.Data.IDbCommand, _
+<# Id(+0) #>ByVal ParamArray parameters As System.Data.IDbDataParameter() _
+<# Id(-1) #>) As IEnumerable(Of <#= Sn(Cl_Name) #>)
+<# Lf(+1) #>
+<# Id(+1) #>If Not parameters Is Nothing Then
+<# Lf(+1) #>
+<# Id(+1) #>For i As Integer = 0 To parameters.Length - 1
+<# Lf(+1) #>
+<# Id(+1) #>If parameters(i).Value Is Nothing AndAlso (parameters(i).Direction = System.Data.ParameterDirection.InputOutput _
+<# Id(+1) #>OrElse parameters(i).Direction = System.Data.ParameterDirection.Input) Then parameters(i).Value = DBNull.Value
+<# Lf(+1) #>
+<# Id(+0) #>command.Parameters.Add(parameters(i))
+<# Lf(+1) #>
+<# Id(-1) #>Next
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #>Return New All(command)
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Public Shared Enumeration Methods "
+<# Lf(+1) #>
+<# Id(+1) #>Public Shared Function [Get]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection _
+<# Id(-1) #>) As IEnumerable(Of <#= Sn(Cl_Name) #>)
+<# Lf(+1) #>
+<# Id(+1) #>Return [Get](connection, "<#= Db_View #>")
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function [Get]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByVal viewName As String _
+<# Id(-1) #>) As IEnumerable(Of <#= Sn(Cl_Name) #>)
+<# Lf(+1) #>
+<# Id(+1) #>Return [Select](connection, String.Format("<#= SQL_SELECT_FORMAT #>", viewName))
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function Filter( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByVal field As Filters, _
+<# Id(+0) #>ByVal value As Object _
+<# Id(-1) #>) As IEnumerable(Of <#= Sn(Cl_Name) #>)
+<# Lf(+1) #>
+<# Id(+1) #>Return Filter(connection, field, New Object() {value})
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function Filter( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByVal fields As Filters, _
+<# Id(+0) #>ByVal values As Object(), _
+<# Id(+0) #>Optional ByVal condition_AND As Boolean = True _
+<# Id(-1) #>) As IEnumerable(Of <#= Sn(Cl_Name) #>)
+<# Lf(+1) #><# enum_Value = 1 #>
+<# Id(+1) #>Dim value_Index As Integer = 0
+<# Id(+0) #>Dim parameter_Names As New System.Text.StringBuilder()
+<# Id(+0) #>Dim parameter_Values As New System.Collections.Generic.List(Of System.Collections.Generic.KeyValuePair(Of System.String, System.Object))
+<# Id(+0) #>Dim condition_Operator As String = " AND "
+<# Id(+0) #>If Not condition_AND Then condition_Operator = " OR "
+<# Lf(+1) #>
+<# Id(+0) #><# For Fd_Current = 0 To Ln(Fd_Names) - 1 #><# If Hv(Fd_Mapping(P_DB_FIELD), 0) Then #>
+<# Id(+0) #>If (fields And <#= enum_Value #>) = <#= enum_Value #> Then
+<# Id(+1) #>If parameter_Names.Length > 0 Then parameter_Names.Append(condition_Operator)
+<# Id(+0) #><# If Fd_ActualType Is GetType(System.String) Then #>
+<# Id(+0) #>If Not String.IsNullOrEmpty(CType(values(value_Index), System.String)) AndAlso CType(values(value_Index), System.String).Contains("*") Then
+<# Id(+1) #>parameter_Names.Append("(<#= Av(Fd_Mapping(P_DB_FIELD), 0) #> LIKE ")
+<# Id(+0) #>If connection.GetType Is GetType(System.Data.SqlClient.SqlConnection) Then values(value_Index) = CStr(values(value_Index)).Replace("*", "%") Else _
+<# Id(+1) #>values(value_Index) = CStr(values(value_Index)).Replace("*", "")
+<# Id(-2) #>Else
+<# Id(+1) #>parameter_Names.Append("(<#= Av(Fd_Mapping(P_DB_FIELD), 0) #> = ")
+<# Id(-1) #>End If
+<# Id(+0) #><# Else #>
+<# Id(+0) #>parameter_Names.Append("(<#= Av(Fd_Mapping(P_DB_FIELD), 0) #> = ")
+<# Id(+0) #><# End If #>
+<# Id(+0) #>If connection.GetType Is GetType(System.Data.OleDb.OleDbConnection) Then
+<# Id(+1) #>parameter_Names.Append("?)")
+<# Id(-1) #>Else
+<# Id(+1) #>parameter_Names.Append("@<#= Fd_Name #>)")
+<# Id(-1) #>End If
+<# Id(+0) #>parameter_Values.Add(New System.Collections.Generic.KeyValuePair(Of System.String, System.Object)("<#= Fd_Name #>", values(value_Index)))
+<# Id(+0) #>value_Index += 1
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #><# enum_Value = enum_Value * 2 #><# End If #><# Next #>
+<# Id(+0) #>Return [Select](connection, String.Format("SELECT * FROM {0} WHERE (" & parameter_Names.ToString() & ")", "<#= Db_View #>"), _
+<# Id(+1) #>parameter_Values.ToArray())
+<# Lf(+1) #>
+<# Id(-2) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #><# If Hv(Db_Table) Then #>
+<# Id(+0) #>#Region " Public Shared Manipulation Methods "
+<# Lf(+1) #>
+<# Id(+1) #>Public Shared Function [Set]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByRef value As <#= Sn(Cl_Name) #> _
+<# Id(-1) #>) As Boolean
+<# Lf(+1) #>
+<# Id(+1) #>Return [Set](connection, value, "<#= Db_Table #>")
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function [Set]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByRef value As <#= Sn(Cl_Name) #>, _
+<# Id(+0) #>ByVal tableName As String _
+<# Id(-1) #>) As Boolean
+<# Lf(+1) #>
+<# Id(+1) #>If value Is Nothing Then Throw New ArgumentNullException("value")
+<# Id(+0) #>If connection Is Nothing Then Throw New ArgumentNullException("connection")
+<# Id(+0) #>If String.IsNullOrEmpty(tableName) Then Throw New ArgumentNullException("tableName")
+<# Id(+0) #>If connection.State = System.Data.ConnectionState.Closed Then connection.Open()
+<# Lf(+1) #>
+<# Id(+0) #>Dim return_Value As Boolean = False
+<# Lf(+1) #>
+<# Id(+0) #>If value.DbRetrievable_ValidateForSet Then
+<# Lf(+1) #>
+<# Id(+1) #>Dim insert_New As Boolean = <#= Insert_Test("value") #>
+<# Lf(+1) #>
+<# Id(+0) #>If connection.GetType Is GetType(System.Data.OleDb.OleDbConnection) Then
+<# Lf(+1) #>
+<# Id(+1) #>Dim OLEDB_Proc As String
+<# Lf(+1) #>
+<# Id(+0) #>If insert_New Then
+<# Id(+1) #>OLEDB_Proc = String.Format("<#= OLEDB_Insert #>", tableName)
+<# Id(-1) #>Else
+<# Id(+1) #>OLEDB_Proc = String.Format("<#= OLEDB_Update #>", tableName)
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #>Dim OLEDB_Comm As New System.Data.OleDb.OleDbCommand(OLEDB_Proc, CType(connection, System.Data.OleDb.OleDbConnection))
+<# Id(+0) #>OLEDB_Comm.CommandType = System.Data.CommandType.Text
+<# Lf(+1) #>
+<# Id(+0) #><# For Fd_Current = 0 To Ln(Fd_Names) - 1 #>
+<# Id(+0) #><# If Hv(Fd_Mapping(P_DB_FIELD), 0)  Then #>
+<# Id(+0) #><# If Not Fd_MappingContains(P_DB_KEY) Then #>
+<# Id(+0) #><# If Pr_Writeable() Then #>
+<# Id(+0) #><# If Fd_IsString Then #>
+<# Id(+0) #>If String.IsNullOrEmpty(value.<#= Fd_Name #>) Then
+<# Id(+1) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Fd_Name #>", String.Empty))
+<# Id(-1) #>Else
+<# Id(+1) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Fd_Name #>", value.<#= Fd_Name #>))
+<# Id(-1) #>End If
+<# Id(+0) #><# ElseIf Fd_IsDateTime AndAlso Fd_IsNullable Then #>
+<# Id(+0) #>If value.<#= Fd_Name #>.HasValue Then
+<# Id(+1) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Fd_Name #>", value.<#= Fd_Name #>.Value.Date))
+<# Id(-1) #>Else
+<# Id(+1) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Fd_Name #>", System.Data.OleDb.OleDbType.Date)).Value = DbNull.Value
+<# Id(-1) #>End If
+<# Id(+0) #><# ElseIf Fd_IsDateTime Then #>
+<# Id(+0) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Fd_Name #>", value.<#= Fd_Name #>.Date))
+<# Id(+0) #><# Else #>
+<# Id(+0) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Fd_Name #>", value.<#= Fd_Name #>))
+<# Id(+0) #><# End If #>
+<# Lf(+1) #><# End If #>
+<# Id(+0) #><# End If #>
+<# Id(+0) #><# End If #>
+<# Id(+0) #><# Next #>
+<# Id(+0) #><# If Not String.IsNullOrEmpty(Key_Field) Then #>If Not insert_New Then OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Key_Field #>", value.<#= Key_Field #>))<# End If #>
+<# Lf(+1) #>
+<# Id(+0) #>return_Value = (OLEDB_Comm.ExecuteNonQuery() = 1)
+<# Lf(+1) #>
+<# Id(+0) #><# If Not String.IsNullOrEmpty(Key_Field) Then #>
+<# Id(+0) #>If insert_New Then
+<# Lf(+1) #>
+<# Id(+1) #>Dim OLEDB_Identity As New System.Data.OleDb.OleDbCommand("SELECT @@IDENTITY", CType(connection, System.Data.OleDb.OleDbConnection))
+<# Id(+0) #>OLEDB_Identity.CommandType = System.Data.CommandType.Text
+<# Id(+0) #>value.<#= Key_Set #> = CType(OLEDB_Identity.ExecuteScalar(), <#= Key_Type #>)
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #><# End If #>
+<# Id(-1) #>ElseIf connection.GetType Is GetType(System.Data.SqlClient.SqlConnection) Then
+<# Lf(+1) #>
+<# Id(+1) #>Dim SQL_Proc As String
+<# Id(+0) #>If insert_New Then
+<# Id(+1) #>SQL_Proc = String.Format("<#= SQL_Insert #>", tableName)
+<# Id(-1) #>Else
+<# Id(+1) #>SQL_Proc = String.Format("<#= SQL_Update #>", tableName)
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #>Dim SQL_Comm As New System.Data.SqlClient.SqlCommand(SQL_Proc, CType(connection, System.Data.SqlClient.SqlConnection))
+<# Id(+0) #>SQL_Comm.CommandType = System.Data.CommandType.Text
+<# Lf(+1) #><# Dim current_Param As System.Int32 = 1 #>
+<# Id(+0) #><# Dim key_Param As System.String = Nothing #>
+<# Id(+0) #><# For Fd_Current = 0 To Ln(Fd_Names) - 1 #><# If Hv(Fd_Mapping(P_DB_FIELD), 0) Then #>
+<# Id(+0) #><# If Fd_MappingContains(P_DB_KEY) Then #>
+<# Id(+0) #>Dim param_<#= current_Param #> As New System.Data.SqlClient.SqlParameter("@<#= Fd_Name #>", value.<#= Fd_Name #>)
+<# Id(+0) #><# key_Param = "param_" & current_Param.ToString() #>
+<# Id(+0) #>If insert_New Then param_<#= current_Param #>.Direction = System.Data.ParameterDirection.Output
+<# Id(+0) #>SQL_Comm.Parameters.Add(param_<#= current_Param #>)
+<# Lf(+1) #><# current_Param += 1 #>
+<# Id(+0) #><# ElseIf Pr_Writeable() Then #>
+<# Id(+0) #>Dim param_<#= current_Param #> As System.Data.SqlClient.SqlParameter
+<# Id(+0) #><# If Fd_IsNullable AndAlso Fd_IsDateTime Then #>
+<# Id(+0) #>If value.<#= Fd_Name #>.HasValue Then
+<# Id(+1) #>param_<#= current_Param #> = New System.Data.SqlClient.SqlParameter("@<#= Fd_Name #>", value.<#= Fd_Name #>.Value)
+<# Id(-1) #>Else
+<# Id(+1) #>param_<#= current_Param #> = New System.Data.SqlClient.SqlParameter("@<#= Fd_Name #>", System.Data.SqlDbType.DateTime)
+<# Id(+0) #>param_<#= current_Param #>.Value = DbNull.Value
+<# Id(-1) #>End If
+<# Id(+0) #><# ElseIf Fd_IsDateTime Then #>
+<# Id(+0) #>param_<#= current_Param #> = New System.Data.SqlClient.SqlParameter("@<#= Fd_Name #>", value.<#= Fd_Name #>)
+<# Id(+0) #><# Else #>
+<# Id(+0) #>param_<#= current_Param #> = New System.Data.SqlClient.SqlParameter("@<#= Fd_Name #>", value.<#= Fd_Name #>)
+<# Id(+0) #><# End If #>
+<# Id(+0) #>SQL_Comm.Parameters.Add(param_<#= current_Param #>)
+<# Lf(+1) #><# current_Param += 1 #><# End If #>
+<# Id(+0) #><# End If #><# Next #>
+<# Id(+0) #>return_Value = (SQL_Comm.ExecuteNonQuery() = 1)
+<# Lf(+1) #><# If Not String.IsNullOrEmpty(key_Param) Then #>If insert_New Then value.<#= Key_Set #> = CType(<#= key_Param #>.Value, <#= Key_Type #>)<# Lf(+2) #><# End If #>
+<# Id(-1) #>Else
+<# Lf(+1) #>
+<# Id(+1) #>Throw New NotImplementedException(String.Format("DB Connection of Type: {0} Not Yet Supported", connection.GetType.Name))
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #>If connection.State = System.Data.ConnectionState.Open Then connection.Close()
+<# Lf(+1) #>
+<# Id(+0) #>Return return_Value
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #><# Dim last_Fd As System.Int32 #><# For Fd_Current = 0 To Ln(Fd_Names) - 1 #><# If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Pr_Writeable() Then #><# last_Fd = Fd_Current #><# End If #><# Next #>
+<# Id(+0) #>Public Shared Function [Create]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #><# For Fd_Current = 0 To Ln(Fd_Names) - 1 #><# If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Pr_Writeable() Then #>ByVal _<#= Fd_Name.ToLower() #> as <#= Fd_Type #><# If Fd_Current = last_Fd Then #> _<# Else #>, _<# End If #><# Lf(+1) #><# End If #><# Next #>
+<# Id(-1) #>) As Boolean
+<# Lf(+1) #>
+<# Id(+1) #>Return [Create](connection, <# For Fd_Current = 0 To Ln(Fd_Names) - 1 #><# If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Pr_Writeable() Then #>_<#= Fd_Name.ToLower() #>, <# End If #><# Next #>"<#= Db_Table #>")
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function [Create]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #><# For Fd_Current = 0 To Ln(Fd_Names) - 1 #><# If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Pr_Writeable() Then #>ByVal _<#= Fd_Name.ToLower() #> as <#= Fd_Type #>, _<# Lf(+1) #><# End If #><# Next #>
+<# Id(+0) #>ByVal tableName As String _
+<# Id(-1) #>) As Boolean
+<# Lf(+1) #>
+<# Id(+1) #>If connection Is Nothing Then Throw New ArgumentNullException("connection")
+<# Id(+0) #>If String.IsNullOrEmpty(tableName) Then Throw New ArgumentNullException("tableName")
+<# Id(+0) #>If connection.State = System.Data.ConnectionState.Closed Then connection.Open()
+<# Lf(+1) #>
+<# Id(+0) #>Dim return_Value As Boolean = False
+<# Lf(+1) #>
+<# Id(+0) #>Dim value As New <#= Sn(Cl_Name) #>()
+<# Id(+0) #><# For Fd_Current = 0 To Ln(Fd_Names) - 1 #><# If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Pr_Writeable() Then #>value.<#= Fd_Name() #> = _<#= Fd_Name.ToLower() #><# Lf(+1) #><# End If #><# Next #>
+<# Lf(+1) #>
+<# Id(+0) #>If value.DbRetrievable_ValidateForSet Then
+<# Lf(+1) #>
+<# Id(+1) #>If connection.GetType Is GetType(System.Data.OleDb.OleDbConnection) Then
+<# Lf(+1) #>
+<# Id(+1) #>Dim OLEDB_Comm As New System.Data.OleDb.OleDbCommand(String.Format("<#= OLEDB_Insert #>", tableName), CType(connection, System.Data.OleDb.OleDbConnection))
+<# Id(+0) #>OLEDB_Comm.CommandType = System.Data.CommandType.Text
+<# Lf(+1) #>
+<# Id(+0) #><# For Fd_Current = 0 To Ln(Fd_Names) - 1 #>
+<# Id(+0) #><# If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Pr_Writeable()  Then #>
+<# Id(+0) #><# If Fd_IsString Then #>
+<# Id(+0) #>If String.IsNullOrEmpty(value.<#= Fd_Name #>) Then
+<# Id(+1) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Fd_Name #>", String.Empty))
+<# Id(-1) #>Else
+<# Id(+1) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Fd_Name #>", value.<#= Fd_Name #>))
+<# Id(-1) #>End If
+<# Id(+0) #><# ElseIf Fd_IsDateTime AndAlso Fd_IsNullable Then #>
+<# Id(+0) #>If value.<#= Fd_Name #>.HasValue Then
+<# Id(+1) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Fd_Name #>", value.<#= Fd_Name #>.Value.Date))
+<# Id(-1) #>Else
+<# Id(+1) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Fd_Name #>", System.Data.OleDb.OleDbType.Date)).Value = DbNull.Value
+<# Id(-1) #>End If
+<# Id(+0) #><# ElseIf Fd_IsDateTime Then #>
+<# Id(+0) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Fd_Name #>", value.<#= Fd_Name #>.Date))
+<# Id(+0) #><# Else #>
+<# Id(+0) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Fd_Name #>", value.<#= Fd_Name #>))
+<# Id(+0) #><# End If #>
+<# Lf(+1) #><# End If #><# Next #>
+<# Id(+0) #>return_Value = (OLEDB_Comm.ExecuteNonQuery() = 1)
+<# Lf(+1) #>
+<# Id(-1) #>ElseIf connection.GetType Is GetType(System.Data.SqlClient.SqlConnection) Then
+<# Lf(+1) #>
+<# Id(+1) #>Dim SQL_Comm As New System.Data.SqlClient.SqlCommand(String.Format("<#= SQL_Insert #>", tableName), CType(connection, System.Data.SqlClient.SqlConnection))
+<# Id(+0) #>SQL_Comm.CommandType = System.Data.CommandType.Text
+<# Lf(+1) #><# current_Param = 1 #>
+<# Id(+0) #><# For Fd_Current = 0 To Ln(Fd_Names) - 1 #><# If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Pr_Writeable()  Then #>
+<# Id(+0) #>Dim param_<#= current_Param #> As System.Data.SqlClient.SqlParameter
+<# Id(+0) #><# If Fd_IsNullable AndAlso Fd_IsDateTime Then #>
+<# Id(+0) #>If value.<#= Fd_Name #>.HasValue Then
+<# Id(+1) #>param_<#= current_Param #> = New System.Data.SqlClient.SqlParameter("@<#= Fd_Name #>", value.<#= Fd_Name #>.Value)
+<# Id(-1) #>Else
+<# Id(+1) #>param_<#= current_Param #> = New System.Data.SqlClient.SqlParameter("@<#= Fd_Name #>", System.Data.SqlDbType.DateTime)
+<# Id(+0) #>param_<#= current_Param #>.Value = DbNull.Value
+<# Id(-1) #>End If
+<# Id(+0) #><# ElseIf Fd_IsDateTime Then #>
+<# Id(+0) #>param_<#= current_Param #> = New System.Data.SqlClient.SqlParameter("@<#= Fd_Name #>", value.<#= Fd_Name #>)
+<# Id(+0) #><# Else #>
+<# Id(+0) #>param_<#= current_Param #> = New System.Data.SqlClient.SqlParameter("@<#= Fd_Name #>", value.<#= Fd_Name #>)
+<# Id(+0) #><# End If #>
+<# Id(+0) #>SQL_Comm.Parameters.Add(param_<#= current_Param #>)
+<# Lf(+1) #><# current_Param += 1 #><# End If #><# Next #>
+<# Id(+0) #>return_Value = (SQL_Comm.ExecuteNonQuery() = 1)
+<# Lf(+1) #>
+<# Id(-1) #>Else
+<# Lf(+1) #>
+<# Id(+1) #>Throw New NotImplementedException(String.Format("DB Connection of Type: {0} Not Yet Supported", connection.GetType.Name))
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #>If connection.State = System.Data.ConnectionState.Open Then connection.Close()
+<# Lf(+1) #>
+<# Id(+0) #>Return return_Value
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #><# End If #>
+<# Id(+0) #><# If Not String.IsNullOrEmpty(Key_Field) Then #>
+<# Id(+0) #>#Region " Public Shared Identity Methods "
+<# Lf(+1) #>
+<# Id(+1) #>Public Shared Function [One]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByRef value As <#= Sn(Cl_Name) #> _
+<# Id(-1) #>) As <#= Sn(Cl_Name) #>
+<# Lf(+1) #>
+<# Id(+1) #>Return [One](connection, value, "<#= Db_View #>")
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function [One]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByVal <#= Key_Field.ToLower() #> As <#= Key_Type #> _
+<# Id(-1) #>) As <#= Sn(Cl_Name) #>
+<# Lf(+1) #>
+<# Id(+1) #>Return [One](connection, <#= Key_Field.ToLower() #>, "<#= Db_View #>")
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function [One]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByRef value As <#= Sn(Cl_Name) #>, _
+<# Id(+0) #>ByVal viewName As String _
+<# Id(-1) #>) As <#= Sn(Cl_Name) #>
+<# Lf(+1) #>
+<# Id(+1) #>Return [One](connection, value.<#= Key_Field #>, viewName)
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function [One]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByVal <#= Key_Field.ToLower() #> As <#= Key_Type #>, _
+<# Id(+0) #>ByVal viewName As String _
+<# Id(-1) #>) As <#= Sn(Cl_Name) #>
+<# Lf(+1) #>
+<# Id(+1) #>If connection.GetType Is GetType(System.Data.OleDb.OleDbConnection) Then
+<# Lf(+1) #>
+<# Id(+1) #>Return System.Linq.Enumerable.FirstOrDefault([Select](connection, _
+<# Id(+1) #>String.Format("<#= OLEDB_Select #>", viewName), _
+<# Id(+0) #>New System.Collections.Generic.KeyValuePair(Of System.String, System.Object)("<#= Key_Field #>", <#= Key_Field.ToLower() #>)))
+<# Lf(+1) #>
+<# Id(-2) #>Else
+<# Lf(+1) #>
+<# Id(+1) #>Return System.Linq.Enumerable.FirstOrDefault([Select](connection, _
+<# Id(+1) #>String.Format("<#= SQL_Select #>", viewName), _
+<# Id(+0) #>New System.Collections.Generic.KeyValuePair(Of System.String, System.Object)("<#= Key_Field #>", <#= Key_Field.ToLower() #>)))
+<# Lf(+1) #>
+<# Id(-2) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #><# If Hv(Db_Table) Then #>
+<# Id(+0) #>Public Shared Function [Delete]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByRef value As <#= Sn(Cl_Name) #> _
+<# Id(-1) #>) As Boolean
+<# Lf(+1) #>
+<# Id(+1) #>Return [Delete](connection, value, "<#= Db_Table #>")
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function [Delete]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByVal <#= Key_Field.ToLower() #> As <#= Key_Type #> _
+<# Id(-1) #>) As Boolean
+<# Lf(+1) #>
+<# Id(+1) #>Return [Delete](connection, <#= Key_Field.ToLower() #>, "<#= Db_Table #>")
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function [Delete]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByRef value As <#= Sn(Cl_Name) #>, _
+<# Id(+0) #>ByVal tableName As String _
+<# Id(-1) #>) As Boolean
+<# Lf(+1) #>
+<# Id(+1) #>Return [Delete](connection, value.<#= Key_Field #>, tableName)
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(+0) #>Public Shared Function [Delete]( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByVal <#= Key_Field.ToLower() #> As <#= Key_Type #>, _
+<# Id(+0) #>ByVal tableName As String _
+<# Id(-1) #>) As Boolean
+<# Lf(+1) #>
+<# Id(+1) #>If <#= Delete_Test(Key_Field.ToLower()) #> Then Throw New ArgumentNullException("value")
+<# Id(+0) #>If connection Is Nothing Then Throw New ArgumentNullException("connection")
+<# Id(+0) #>If String.IsNullOrEmpty(tableName) Then Throw New ArgumentNullException("tableName")
+<# Id(+0) #>If connection.State = System.Data.ConnectionState.Closed Then connection.Open()
+<# Lf(+1) #>
+<# Id(+0) #>Dim return_Value As Boolean = False
+<# Lf(+1) #>
+<# Id(+0) #>If connection.GetType Is GetType(System.Data.OleDb.OleDbConnection) Then
+<# Lf(+1) #>
+<# Id(+1) #>Dim OLEDB_Proc As String = String.Format("<#= OLEDB_Delete #>", tableName)
+<# Lf(+1) #>
+<# Id(+0) #>Dim OLEDB_Comm As New System.Data.OleDb.OleDbCommand(OLEDB_Proc, CType(connection, System.Data.OleDb.OleDbConnection))
+<# Id(+0) #>OLEDB_Comm.CommandType = System.Data.CommandType.Text
+<# Lf(+1) #>
+<# Id(+0) #>OLEDB_Comm.Parameters.Add(New System.Data.OleDb.OleDbParameter("<#= Key_Field #>", <#= Key_Field.ToLower() #>))
+<# Lf(+1) #>
+<# Id(+0) #>return_Value = (OLEDB_Comm.ExecuteNonQuery() = 1)
+<# Lf(+1) #>
+<# Id(-1) #>ElseIf connection.GetType Is GetType(System.Data.SqlClient.SqlConnection) Then
+<# Lf(+1) #>
+<# Id(+1) #>Dim SQL_Proc As String = String.Format("<#= SQL_Delete #>", tableName)
+<# Lf(+1) #>
+<# Id(+0) #>Dim SQL_Comm As New System.Data.SqlClient.SqlCommand(SQL_Proc, CType(connection, System.Data.SqlClient.SqlConnection))
+<# Id(+0) #>SQL_Comm.CommandType = System.Data.CommandType.Text
+<# Lf(+1) #>
+<# Id(+0) #>SQL_Comm.Parameters.Add(New System.Data.SqlClient.SqlParameter("@<#= Key_Field #>", <#= Key_Field.ToLower() #>))
+<# Lf(+1) #>
+<# Id(+0) #>return_Value = (SQL_Comm.ExecuteNonQuery() = 1)
+<# Lf(+1) #>
+<# Id(-1) #>Else
+<# Lf(+1) #>
+<# Id(+1) #>Throw New NotImplementedException(String.Format("DB Connection of Type: {0} Not Yet Supported", connection.GetType.Name))
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #>If connection.State = System.Data.ConnectionState.Open Then connection.Close()
+<# Lf(+1) #>
+<# Id(+0) #>Return return_Value
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #><# End If #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #><# If Not String.IsNullOrEmpty(Parent_Field) AndAlso Not String.IsNullOrEmpty(Leaf_Field) Then #>
+<# Id(+0) #>#Region " Public Shared Tree Methods "
+<# Lf(+1) #><# If Not String.IsNullOrEmpty(Root_Field) Then #>
+<# Id(+1) #><#= St("Builds a Tree for Tree-Stuctured Objects") #>
+<# Id(+0) #><#= Pt("root_Id", "The Root of Tree to Retrieve From") #>
+<# Id(+0) #><#= Pt("number_Of_Descendant_Levels", "The Number of Descendant Levels Down to Retrieve (&lt;0 = All)") #>
+<# Id(+0) #><#= Pt("get_Ancestors", "Whether to Retrieve Ancestors as well") #>
+<# Id(+0) #><#= Ut("The Tree As A List") #>
+<# Id(+0) #>Public Shared Function Tree( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>Optional ByVal root_Id As <#= Key_Type #> = <# If Key_IsInteger Then #>-1<# Else #>Nothing<# End If #>, _
+<# Id(+0) #>Optional ByVal number_Of_Descendant_Levels As System.Int32 = -1, _
+<# Id(+0) #>Optional ByVal get_Ancestors As System.Boolean = False, _
+<# Id(-1) #>) As System.Collections.Generic.List(Of <#= Sn(Cl_Name) #>)
+<# Lf(+1) #>
+<# Id(+1) #>If root_Id <# If Key_IsInteger Then #><= 0<# Else #>= Nothing<# End If #> Then
+<# Lf(+1) #>
+<# Id(+1) #>Return Tree(connection, System.Linq.Enumerable.FirstOrDefault(<#= Sn(Cl_Name) #>.All.Filter(connection, _
+<# Id(+1) #><#= Sn(Cl_Name) #>.All.Filters.<#= Root_Field.ToUpper() #>, True)), number_Of_Descendant_Levels, get_Ancestors)
+<# Lf(+1) #>
+<# Id(-2) #>Else
+<# Lf(+1) #>
+<# Id(+1) #>Return Tree(connection, <#= Sn(Cl_Name) #>.All.One(connection, root_Id), number_Of_Descendant_Levels, get_Ancestors)
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End Function<# Id(-1) #>
+<# Lf(+2) #><# End If #>
+<# Id(+1) #><#= St("Builds a Tree for Tree-Stuctured Objects") #>
+<# Id(+0) #><#= Pt("root_Id", "The Root of Tree to Retrieve From") #>
+<# Id(+0) #><#= Pt("number_Of_Descendant_Levels", "The Number of Descendant Levels Down to Retrieve (&lt;0 = All)") #>
+<# Id(+0) #><#= Pt("get_Ancestors", "Whether to Retrieve Ancestors as well") #>
+<# Id(+0) #><#= Ut("The Tree As A List") #>
+<# Id(+0) #>Public Shared Function Tree( _
+<# Id(+1) #>ByVal connection As System.Data.IDbConnection, _
+<# Id(+0) #>ByVal root As <#= Sn(Cl_Name) #>, _
+<# Id(+0) #>Optional ByVal number_Of_Descendant_Levels As System.Int32 = -1, _
+<# Id(+0) #>Optional ByVal get_Ancestors As System.Boolean = False, _
+<# Id(+0) #>Optional ByRef tree_List As System.Collections.Generic.List(Of <#= Sn(Cl_Name) #>) = Nothing, _
+<# Id(+0) #><# If Not String.IsNullOrEmpty(Level_Field) Then #>Optional ByVal level As System.Int32 = 0 _<# Lf(+1) #><# End If #>
+<# Id(-1) #>) As System.Collections.Generic.List(Of <#= Sn(Cl_Name) #>)
+<# Lf(+1) #>
+<# Id(+1) #>If tree_List Is Nothing Then tree_List = New System.Collections.Generic.List(Of <#= Sn(Cl_Name) #>)
+<# Lf(+1) #>
+<# Id(+0) #>If Not root Is Nothing Then
+<# Lf(+1) #>
+<# Id(+1) #>For i As Integer = 0 To tree_List.Count - 1
+<# Id(+1) #>If root.<#= Key_Field #> = tree_List(i).<#= Key_Field #> Then Return tree_List
+<# Id(-1) #>Next
+<# Lf(+1) #>
+<# Id(+0) #><# If Not String.IsNullOrEmpty(Level_Field) Then #>root.<#= Level_Field #> = level<# Lf(+1) #><# End If #>
+<# Id(+0) #>tree_List.Add(root)
+<# Lf(+1) #>
+<# Id(+0) #>If get_Ancestors Then
+<# Lf(+1) #>
+<# Id(+1) #>Dim last_Ancestor As <#= Sn(Cl_Name) #> = root
+<# Lf(+1) #>
+<# Id(+0) #>Do Until last_Ancestor.<#= Root_Field #>
+<# Lf(+1) #>
+<# Id(+1) #>Dim new_Ancestor As <#= Sn(Cl_Name) #> = <#= Sn(Cl_Name) #>.All.One(connection, last_Ancestor.<#= Parent_Field #>)
+<# Id(+0) #>tree_List.Insert(0, new_Ancestor)
+<# Id(+0) #><# If Not String.IsNullOrEmpty(Level_Field) Then #><# Lf(+1) #>tree_List(0).<#= Level_Field #> = tree_List(1).<#= Level_Field #>- 1<# End If #>
+<# Lf(+1) #>
+<# Id(+0) #>last_Ancestor = new_Ancestor
+<# Lf(+1) #>
+<# Id(-1) #>Loop
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #>If number_Of_Descendant_Levels <> 0 AndAlso Not root.<#=Leaf_Field #> Then
+<# Lf(+1) #>
+<# Id(+0) #>number_Of_Descendant_Levels -= 1
+<# Id(+0) #><# If Not String.IsNullOrEmpty(Level_Field) Then #>level += 1<# Lf(+1) #><# End If #>
+<# Lf(+1) #>
+<# Id(+0) #>Dim children As System.Collections.Generic.List(Of <#= Sn(Cl_Name) #>) = _
+<# Id(+1) #>System.Linq.Enumerable.ToList(<#= Sn(Cl_Name) #>.All.Filter(connection, <#= Sn(Cl_Name) #>.All.Filters.<#= Parent_Field.ToUpper() #>, root.<#= Key_Field #>))
+<# Lf(+1) #>
+<# Id(-1) #>For i As Integer = 0 To children.Count - 1
+<# Lf(+1) #>
+<# Id(+1) #><#= Sn(Cl_Name) #>.All.Tree(connection, children(i), number_Of_Descendant_Levels, False, tree_List<# If Not String.IsNullOrEmpty(Level_Field) Then #>, level<# End If #>)
+<# Lf(+1) #>
+<# Id(-1) #>Next
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #>Return tree_List
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+2) #><# End If #><# End If #>
+<# Id(-1) #>End Class
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #><# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE PARAMETER NAMES										'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Const P_DB_FIELD As String = "Db-Field"					' The Field Mapping Names (DB Column)
+	Public Const P_DB_TABLE As String = "Db-Table"					' The Table (Read-Write) in the DB - Optional for Write Methods
+	Public Const P_DB_VIEW As String = "Db-View"					' The View (Read-Only) in the DB. Use read-only fields for generated columns (won't be persisted).
+	Public Const P_DB_LOOSE As String = "Db-Loose"					' The Field Mapping should not throw an error is it doesn't match!
+	Public Const P_DB_KEY As String = "Db-Key"						' Designates a Field as the Primary Key/Identifier for the Object
+	Public Const P_DB_PARENT As String = "DbTree-Parent"			' Designates a Tree Field as the Parent Identifier for the Object
+	Public Const P_DB_LEAF As String = "DbTree-Leaf"				' Designates a Tree Field as the Leaf Discrimator for the Object
+	Public Const P_DB_ROOT As String = "DbTree-Root"				' Designates a Tree Field as the Root Discrimator for the Object
+	Public Const P_DB_LEVEL As String = "DbTree-Level"				' Designates a Tree Field as the Level for the Object
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Const SQL_INDEX_FORMAT As String = "IDX_{0}"				' Format for SQL Indexes
+	Public Const SQL_SELECT_FORMAT As String = "SELECT * FROM {0}"	' Format for SQL Select
+	Public Pr_ThreadSafes As String()								' Names of the Thread-Safe Properties
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Db_View As String						' The View is Read-Only (e.g. just used for Selects)
+		Get
+			If Hv(Cl_Mapping(P_DB_VIEW)) Then
+				Return Cl_Mapping(P_DB_VIEW)
+			Else
+				Return Db_Table
+			End If
+		End Get
+	End Property
+
+	Public ReadOnly Property Db_Table As String						' The Table is Read-Write, if not supplied there will be no Sets/Deletes
+		Get
+			Return Cl_Mapping(P_DB_TABLE)
+		End Get
+	End Property
+
+	Public ReadOnly Property Db_Loose As Boolean					' The Field Mapping should not throw an error is it doesn't match!
+		Get
+			Return Cl_MappingContains(P_DB_LOOSE)
+		End Get
+	End Property
+
+	Public ReadOnly Property Key_Field() As String
+		Get
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Fd_MappingContains(P_DB_KEY) Then Return Fd_Name
+			Next
+			Return Nothing
+		End Get
+	End Property
+
+	Public ReadOnly Property Key_Type() As String
+		Get
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Fd_MappingContains(P_DB_KEY) Then Return Fd_Type
+			Next
+			Return Nothing
+		End Get
+	End Property
+
+	Public ReadOnly Property Key_IsInteger() As Boolean
+		Get
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Fd_MappingContains(P_DB_KEY) Then Return Fd_IsInteger
+			Next
+			Return Nothing
+		End Get
+	End Property
+
+	Public ReadOnly Property Key_Set() As String
+		Get
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Fd_MappingContains(P_DB_KEY) Then Return Fd_Set
+			Next
+			Return Nothing
+		End Get
+	End Property
+
+	' This Behaviour does not yet support multiple Key Fields
+	Public ReadOnly Property Key_Fields() As String()
+		Get
+			Dim ret_List As New List(Of String)
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Fd_MappingContains(P_DB_KEY) Then ret_List.Add(Fd_Name)
+			Next
+			Return ret_List.ToArray()
+		End Get
+	End Property
+
+	Public ReadOnly Property Parent_Field() As String
+		Get
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Fd_MappingContains(P_DB_PARENT) Then Return Fd_Name
+			Next
+			Return Nothing
+		End Get
+	End Property
+
+	Public ReadOnly Property Leaf_Field() As String
+		Get
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Fd_MappingContains(P_DB_LEAF) Then Return Fd_Name
+			Next
+			Return Nothing
+		End Get
+	End Property
+
+	Public ReadOnly Property Root_Field() As String
+		Get
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Fd_MappingContains(P_DB_ROOT) Then Return Fd_Name
+			Next
+			Return Nothing
+		End Get
+	End Property
+
+	Public ReadOnly Property Level_Field() As String
+		Get
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Fd_MappingContains(P_DB_LEVEL) Then Return Fd_Name
+			Next
+			Return Nothing
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_IndexVariables() As String()
+		Get
+			Dim retList As New System.Collections.Generic.List(Of String)
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) Then _
+					retList.Add(String.Format(SQL_INDEX_FORMAT, Av(Fd_Mapping(P_DB_FIELD), 0).ToUpper()))
+			Next
+			Return retList.ToArray()
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_IndexFields() As String()
+		Get
+			Dim retList As New System.Collections.Generic.List(Of String)
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+			If Hv(Fd_Mapping(P_DB_FIELD), 0) Then _
+				retList.Add(Av(Fd_Mapping(P_DB_FIELD), 0))
+			Next
+			Return retList.ToArray()
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_IndexSets() As String()
+		Get
+			Dim retList As New System.Collections.Generic.List(Of String)
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) Then _
+					retList.Add(Fd_Set)
+			Next
+			Return retList.ToArray()
+		End Get
+	End Property
+
+	Public ReadOnly Property Fd_IndexTypes() As String()
+		Get
+			Dim retList As New System.Collections.Generic.List(Of String)
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) Then _
+					retList.Add(Fd_Type)
+			Next
+			Return retList.ToArray()
+		End Get
+	End Property
+
+	Public ReadOnly Property OLEDB_Update() As String
+		Get
+			Dim updates As New System.Text.StringBuilder
+			Dim conditions As New System.Text.StringBuilder
+
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) Then
+
+					If Fd_MappingContains(P_DB_KEY) Then
+
+						If conditions.Length > 0 Then conditions.Append(" AND ")
+
+						conditions.Append(Av(Fd_Mapping(P_DB_FIELD), 0))
+						conditions.Append(" = ")
+						conditions.Append("?")
+
+					ElseIf Pr_Writeable() Then
+
+						If updates.Length > 0 Then updates.Append(", ")
+						updates.Append(Av(Fd_Mapping(P_DB_FIELD), 0))
+						updates.Append(" = ")
+						updates.Append("?")
+
+					End If
+
+				End If
+			Next
+
+			Return "UPDATE {0} SET " & updates.ToString() & " WHERE (" & conditions.ToString() & ")"
+		End Get
+	End Property
+
+	Public ReadOnly Property OLEDB_Insert() As String
+		Get
+			Dim column_Names As New System.Text.StringBuilder
+			Dim parameter_Names As New System.Text.StringBuilder
+
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) Then
+
+					If Not Fd_MappingContains(P_DB_KEY) AndAlso Pr_Writeable() Then
+
+						If column_Names.Length > 0 Then column_Names.Append(", ")
+						column_Names.Append(Av(Fd_Mapping(P_DB_FIELD), 0))
+
+						If parameter_Names.Length > 0 Then parameter_Names.Append(", ")
+						parameter_Names.Append("?")
+
+					End If
+
+				End If
+
+			Next
+
+			Return "INSERT INTO {0} (" & column_Names.ToString() & ") VALUES (" & parameter_Names.ToString() & ")"
+
+		End Get
+	End Property
+
+	Public ReadOnly Property OLEDB_Delete() As String
+		Get
+			Dim parameter_Names As New System.Text.StringBuilder
+
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) Then
+
+					If Fd_MappingContains(P_DB_KEY) Then
+
+						parameter_Names.Clear()
+						parameter_Names.Append(Av(Fd_Mapping(P_DB_FIELD), 0))
+						parameter_Names.Append(" = ?")
+
+					End If
+
+				End If
+
+			Next
+
+			Return "DELETE FROM {0} WHERE (" & parameter_Names.ToString() & ")"
+
+		End Get
+	End Property
+
+	Public ReadOnly Property OLEDB_Select() As String
+		Get
+			Dim parameter_Names As New System.Text.StringBuilder
+
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) Then
+
+					If Fd_MappingContains(P_DB_KEY) Then
+
+						parameter_Names.Clear()
+						parameter_Names.Append(Av(Fd_Mapping(P_DB_FIELD), 0))
+						parameter_Names.Append(" = ?")
+
+					End If
+
+				End If
+
+			Next
+
+			Return "SELECT * FROM {0} WHERE (" & parameter_Names.ToString() & ")"
+
+		End Get
+	End Property
+
+	Public ReadOnly Property SQL_Update() As String
+		Get
+			Dim updates As New System.Text.StringBuilder
+			Dim conditions As New System.Text.StringBuilder
+
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) Then
+
+					If Fd_MappingContains(P_DB_KEY) Then
+
+						If conditions.Length > 0 Then conditions.Append(" AND ")
+
+						conditions.Append(Av(Fd_Mapping(P_DB_FIELD), 0))
+						conditions.Append(" = ")
+						conditions.Append("@")
+						conditions.Append(Fd_Name)
+
+					ElseIf Pr_Writeable() Then
+
+						If updates.Length > 0 Then updates.Append(", ")
+						updates.Append(Av(Fd_Mapping(P_DB_FIELD), 0))
+						updates.Append(" = ")
+						updates.Append("@")
+						updates.Append(Fd_Name)
+
+					End If
+
+				End If
+
+			Next
+
+			Return "UPDATE {0} SET " & updates.ToString() & " WHERE (" & conditions.ToString() & ")"
+		End Get
+	End Property
+
+	Public ReadOnly Property SQL_Insert() As String
+		Get
+			Dim column_Names As New System.Text.StringBuilder
+			Dim parameter_Names As New System.Text.StringBuilder
+
+			Dim pre_Query As New System.Text.StringBuilder
+			Dim post_Query As New System.Text.StringBuilder
+
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) Then
+
+					Dim include_Insert As Boolean = False
+
+					If Fd_MappingContains(P_DB_KEY) Then
+
+						If Fd_IsInteger Then
+
+							post_Query.Clear()
+							post_Query.Append("; SELECT ")
+							post_Query.Append("@")
+							post_Query.Append(Fd_Name)
+							post_Query.Append(" = SCOPE_IDENTITY();")
+
+						Else
+
+							post_Query.Clear()
+							post_Query.Append(";")
+
+							pre_Query.Clear()
+							pre_Query.Append("SELECT ")
+							pre_Query.Append("@")
+							pre_Query.Append(Fd_Name)
+							pre_Query.Append(" = newid(); ")
+
+							include_Insert = True
+
+						End If
+
+					End If
+
+					If include_Insert OrElse Pr_Writeable() Then
+
+						If column_Names.Length > 0 Then column_Names.Append(", ")
+						column_Names.Append(Av(Fd_Mapping(P_DB_FIELD), 0))
+
+						If parameter_Names.Length > 0 Then parameter_Names.Append(", ")
+						parameter_Names.Append("@")
+						parameter_Names.Append(Fd_Name)
+
+					End If
+
+				End If
+
+			Next
+
+			Return pre_Query.ToString & "INSERT INTO {0} (" & column_Names.ToString() & ") VALUES (" & parameter_Names.ToString() & ")" & post_Query.ToString()
+
+		End Get
+	End Property
+
+	Public ReadOnly Property SQL_Delete() As String
+		Get
+			Dim parameter_Names As New System.Text.StringBuilder
+
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) Then
+
+					If Fd_MappingContains(P_DB_KEY) Then
+
+						parameter_Names.Clear()
+						parameter_Names.Append(Av(Fd_Mapping(P_DB_FIELD), 0))
+						parameter_Names.Append(" = ")
+						parameter_Names.Append("@")
+						parameter_Names.Append(Fd_Name)
+
+					End If
+
+				End If
+
+			Next
+
+			Return "DELETE FROM {0} WHERE (" & parameter_Names.ToString() & ")"
+
+		End Get
+	End Property
+
+	Public ReadOnly Property SQL_Select() As String
+		Get
+			Dim parameter_Names As New System.Text.StringBuilder
+
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) Then
+
+					If Fd_MappingContains(P_DB_KEY) Then
+
+						parameter_Names.Clear()
+						parameter_Names.Append(Av(Fd_Mapping(P_DB_FIELD), 0))
+						parameter_Names.Append(" = ")
+						parameter_Names.Append("@")
+						parameter_Names.Append(Fd_Name)
+
+					End If
+
+				End If
+
+			Next
+
+			Return "SELECT * FROM {0} WHERE (" & parameter_Names.ToString() & ")"
+
+		End Get
+	End Property
+
+	Public ReadOnly Property Insert_Test( _
+		ByVal object_Name As String _
+	) As String
+		Get
+
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Fd_MappingContains(P_DB_KEY) Then
+
+					If Fd_IsInteger Then
+
+						Return String.Format("({0}.{1} <= 0)", object_Name, Fd_Name)
+
+					ElseIf Fd_IsGuid Then
+
+						Return String.Format("({0}.{1} = Nothing)", object_Name, Fd_Name)
+
+					End If
+
+				End If
+
+			Next
+
+			Return "True"
+
+		End Get
+	End Property
+
+	Public ReadOnly Property Delete_Test( _
+		ByVal variable_Name As String _
+	) As String
+		Get
+
+			For Fd_Current = 0 To Ln(Fd_Names) - 1
+
+				If Hv(Fd_Mapping(P_DB_FIELD), 0) AndAlso Fd_MappingContains(P_DB_KEY) Then
+
+					If Fd_IsInteger Then
+
+						Return String.Format("({0} <= 0)", variable_Name)
+
+					ElseIf Fd_IsGuid Then
+
+						Return String.Format("({0} = Nothing)", variable_Name)
+
+					End If
+
+				End If
+
+			Next
+
+			Return "False"
+
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

@@ -1,0 +1,172 @@
+﻿<#+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' BEHAVIOUR VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private Be_Names As String()									' Names of the Behaviours (n)
+	Private Be_Parameters As New Hashtable							' Parameters for the Behaviours (Value:Optional;Value) (p)
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' BEHAVIOUR PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private ReadOnly Property Be_Parameter( _
+		ByVal name As String _
+	) As DictionaryEntry()											' Parameters for a Particular Behaviour
+		Get
+			If Be_Parameters.ContainsKey(name) Then
+				Return CType(Be_Parameters(name), List(Of DictionaryEntry)).ToArray()
+			Else
+				Return New DictionaryEntry() {}
+			End If
+		End Get
+	End Property
+
+	Private ReadOnly Property Be( _
+		ByVal extension_Point As String, _
+		ByVal language As La, _
+		ByVal ParamArray parameters As DictionaryEntry() _
+	) As String														' Call Behaviours for an Extension Point (with optional Parameters)
+		Get
+			Dim tBuilder As New StringBuilder()
+
+			If Ln(Be_Names) > 0 Then
+
+				For i As Integer = 0 to Ln(Be_Names) - 1
+
+					Dim behaviour As String = Call_Behaviour(Be_Names(i), extension_Point, language, parameters)
+
+					If Not String.IsNullOrEmpty(behaviour) Then tBuilder.AppendLine(behaviour)
+
+				Next
+
+			End If
+
+			Return tBuilder.ToString().TrimEnd()
+		End Get
+	End Property
+
+	Private ReadOnly Property Bo( _
+		ByVal extension_Point As String, _
+		ByVal language As La, _
+		ByVal ParamArray parameters As DictionaryEntry() _
+	) As System.Collections.Generic.Dictionary(Of String, String)	' Call Behaviours for an Extension Point (with optional Parameters)
+		Get
+			Dim ret As New System.Collections.Generic.Dictionary(Of String, String)
+
+			If Ln(Be_Names) > 0 Then
+
+				For i As Integer = 0 to Ln(Be_Names) - 1
+
+					Dim behaviour As String = Call_Behaviour(Be_Names(i), extension_Point, language, parameters)
+
+					If Not String.IsNullOrEmpty(behaviour) Then ret.Add(Be_Names(i), behaviour)
+
+				Next
+
+			End If
+
+			Return ret
+		End Get
+	End Property
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' BEHAVIOUR METHODS												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private Function Call_Behaviour( _
+		ByVal behaviour_Name As String, _
+		ByVal extension_Point As String, _
+		ByVal language As La, _
+		ByVal ParamArray parameters As DictionaryEntry() _
+	) As String
+
+		Dim behaviour_Parameters As New List(Of DictionaryEntry)
+		behaviour_Parameters.AddRange(Be_Parameter(behaviour_Name))
+		If Not parameters Is Nothing Then behaviour_Parameters.AddRange(parameters)
+
+		Dim behaviour_TemplateName As String = _
+			String.Format("{0}_{1}_{2}.tt", [Enum].GetName(GetType(La), language), behaviour_Name, extension_Point)
+
+		Return Ct("Behaviours", behaviour_TemplateName, True, behaviour_Parameters.ToArray())
+
+	End Function
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' ADDITION METHODS												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Sub Add_Behaviour( _
+		Optional ByVal n As String = Nothing, _
+		Optional ByVal p As String = Nothing _
+	)																' Method to Add a Behaviour (with optional Parameters)
+																	' param1|param2:value1|param3:value2;value3 (use case-sensitive &sc; to escape ;, &pipe; to escape |)
+		If Not String.IsNullOrEmpty(n) Then
+
+			If Not Ae(Be_Names, n) Then Ao(Be_Names, n)
+
+			If Not String.IsNullOrEmpty(p) Then
+
+				Dim ESCAPED_SEMI_COLON As String = "&sc;"
+				Dim ESCAPED_PIPE As String = "&pipe;"
+
+				Dim random_Generator As New Random()
+
+				If Not Be_Parameters.ContainsKey(n) Then Be_Parameters(n) = New List(Of DictionaryEntry)
+
+				Dim random_Pipe As String = String.Format("#{0}#", random_Generator.Next().ToString)
+
+				Do While p.Contains(random_Pipe)
+					random_Pipe = String.Format("#{0}#", random_Generator.Next().ToString)
+				Loop
+
+				p = p.Replace(ESCAPED_PIPE, random_Pipe)
+
+				Dim parameters As String() = p.Split(PIPE)
+
+				For each parameter As String in parameters
+
+					Dim parameter_Entry As DictionaryEntry
+
+					If parameter.Contains(COLON) Then
+
+						Dim parameter_Value As Object = parameter.Substring(parameter.IndexOf(COLON) + 1)
+
+						Dim random_Sc As String = String.Format("#{0}#", random_Generator.Next().ToString)
+
+						Do While parameter_Value.Contains(random_Sc)
+							random_Sc = String.Format("#{0}#", random_Generator.Next().ToString)
+						Loop
+
+						parameter_Value = parameter_Value.Replace(ESCAPED_SEMI_COLON, random_Sc)
+
+						If parameter_Value.Contains(SEMI_COLON) Then
+
+							parameter_Value = parameter_Value.Split(SEMI_COLON)
+
+							For i As Integer = 0 To parameter_Value.Length - 1
+								parameter_Value(i) = parameter_Value(i).Replace(random_Sc, SEMI_COLON).Replace(random_Pipe, PIPE)
+							Next
+
+						Else
+
+							parameter_Value = parameter_Value.Replace(random_Sc, SEMI_COLON).Replace(random_Pipe, PIPE)
+
+						End If
+
+						parameter_Entry = New DictionaryEntry(parameter.Substring(0, parameter.IndexOf(COLON)), parameter_Value)
+
+					Else
+
+						parameter_Entry = New DictionaryEntry(parameter, True)
+
+					End If
+
+					CType(Be_Parameters(n), List(Of DictionaryEntry)).Add(parameter_Entry)
+
+				Next
+
+			End If
+
+		End If
+
+	End Sub
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

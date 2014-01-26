@@ -1,0 +1,24 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #>
+<# If Hv(Db_View) Then #><System.Data.Linq.Mapping.Table(Name:="<#= Db_View #>")> _<# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE PARAMETER NAMES										'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Const P_DB_TABLE As String = "Db-Table"					' The Table (Read-Write) in the DB - Optional for Write Methods
+	Public Const P_DB_VIEW As String = "Db-View"					' The View (Read-Only) in the DB. Use read-only fields for generated columns (won't be persisted).
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Db_View As String						' The View is Read-Only (e.g. just used for Selects)
+		Get
+			Return Cl_Mapping(P_DB_VIEW)
+		End Get
+	End Property
+
+	Public ReadOnly Property Db_Table As String						' The Table is Read-Write, if not supplied there will be no Sets/Deletes
+		Get
+			Return Cl_Mapping(P_DB_TABLE)
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

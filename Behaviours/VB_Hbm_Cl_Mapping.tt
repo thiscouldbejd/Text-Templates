@@ -1,0 +1,52 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #><# If Hv(Db_View) Then #>
+<# Id(+0) #><?xml version="1.0" encoding="utf-8" ?>
+<# Id(+0) #><hibernate-mapping <# If Hv(Cl_Assembly) Then #>assembly="<#= Cl_Assembly #>" <#End If #><# If Hv(Cl_Namespace) Then #>namespace="<# If Hv(Cl_Assembly) Then #><#= Cl_Assembly #>.<#End If #><#= Cl_Namespace #>" <#End If #>xmlns="urn:nhibernate-mapping-2.2" default-lazy="false" default-access="field.pascalcase-m-underscore">
+<# Lf(+1) #>
+<# Id(+1) #><class name="<#= Cl_Name #>" table="<#= Db_View #>" mutable="<#= Hv(Db_Table).ToString().ToLower() #>">
+<# Lf(+1) #>
+<# Id(+1) #><# For Fd_Current = 0 to Ln(Va_Names) - 1 #>
+<# Id(+0) #><# If Hv(Fd_Mapping("Db-Field"), 0) AndAlso Fd_MappingContains("Db-Key") Then #>
+<# Id(+0) #><id name="<#= Fd_Set #>" type="<#= Fd_Type #>" column="<#= Av(Fd_Mapping("Db-Field"), 0) #>">
+<# Id(+1) #><# If String.Compare(Fd_Type, "system.guid", True) = 0 Then #><generator class="guid" /><# Else #><generator class="native" /><# End If #>
+<# Lf(+1) #>
+<# Id(-1) #></id>
+<# Lf(+1) #><# End If #>
+<# Id(+0) #><# If Hv(Fd_Mapping("Db-Field"), 0) AndAlso Fd_MappingContains("Db-Version") Then #>
+<# Lf(+1) #><version name="<#= Fd_Set #>" column="<#= Av(Fd_Mapping("NHibernate"), 0) #>" />
+<# Lf(+1) #><# End If #><# Next #>
+<# Id(+0) #><# For Fd_Current = 0 to Ln(Va_Names) - 1 #>
+<# Id(+0) #><# If Hv(Fd_Mapping("Db-Field"), 0) AndAlso Not Fd_MappingContains("Db-Key") AndAlso Not Fd_MappingContains("Db-Version") Then #>
+<# Id(+0) #><# If Not Fd_Type.StartsWith("System.") AndAlso Hv(Cl_Assembly) Then #><many-to-one name="<#= Fd_Set #>" class="<#= Fd_Type #>, <#= Cl_Assembly #>" cascade="none"><# Else #><property name="<#= Fd_Set #>" type="<#= Fd_Type #>"><# End If #>
+<# Lf(+1) #>
+<# Id(+1) #><column name="<#= Av(Fd_Mapping("Db-Field"), 0) #>" />
+<# Id(-1) #><# If Fd_Type.StartsWith("System.") #></property><# Else #></many-to-one><# End If #>
+<# Lf(+2) #><# End If #><# Next #>
+<# Id(-1) #></class>
+<# Lf(+1) #>
+<# Id(-1) #></hibernate-mapping><# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE PARAMETER NAMES										'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Const P_DB_TABLE As String = "Db-Table"					' The Table (Read-Write) in the DB - Optional for Write Methods
+	Public Const P_DB_VIEW As String = "Db-View"					' The View (Read-Only) in the DB. Use read-only fields for generated columns (won't be persisted).
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Db_View As String						' The View is Read-Only (e.g. just used for Selects)
+		Get
+			If Hv(Db_Table) Then
+				Return Db_Table
+			Else
+				Return Cl_Mapping(P_DB_VIEW)
+			End If
+		End Get
+	End Property
+
+	Public ReadOnly Property Db_Table As String						' The Table is Read-Write, if not supplied there will be no Sets/Deletes
+		Get
+			Return Cl_Mapping(P_DB_TABLE)
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

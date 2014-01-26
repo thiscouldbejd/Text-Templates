@@ -1,0 +1,3 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# If Hv(Fd_Description) Then #>
+<# Id(+0) #><Leviathan.Description(Description:="<#= Fd_Description #>")> _<# End If #>

@@ -1,0 +1,3 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Behaviours\VB_Attributable.tt" #>
+<# Id(+0) #><AttributeUsageAttribute(<#= At_Targets #>, _
+<# Id(+1) #>AllowMultiple:=<#= At_Multiple #>, Inherited:=<#= At_Inherited #>)> _

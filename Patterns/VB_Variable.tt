@@ -1,0 +1,15 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #><#= St(Va_Description) #>
+<# Id(+0) #><#= Rt(Va_Remark) #>
+<# Id(+0) #><#= Va_Visibility #> <# If Va_Event Then #>WithEvents <# End If #><#= Sn(Va_Name) #> As <#= Va_Type #><# If Hv(Va_Default) Then #> = <# If Va_Type.EndsWith("String") Then #>"<# End If #><#= Va_Default #><# If Va_Type.EndsWith("String") Then #>"<# End If #><# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Va_Visibility As String									' Visibility of the Variable
+	Public Va_Name As String										' Name of the Variable (n)
+	Public Va_Description As String									' Description of the Variable (d)
+	Public Va_Remark As String										' Remark for the Variable (r)
+	Public Va_Type As String										' Type of the Variable (t)
+	Public Va_Event As Boolean										' Whether the Variable Generates Events (e)
+	Public Va_Default As String										' Default for the Variable (f)
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

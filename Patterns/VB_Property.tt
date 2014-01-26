@@ -1,0 +1,68 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #><#= St(Pr_Description) #>
+<# Id(+0) #><#= Rt(Pr_Remark) #>
+<# If Hv(Pr_Header) Then #><#= Pr_Header #><# End If #>
+<# Id(+0) #><# If Pr_Default #>Default <# End If #><#= Pr_Visibility #> <# If Pr_Override Then #>Overrides <# End If #><# If Pr_Overridable Then #>Overridable <# End If #><# If Pr_Shadow #>Shadows <# End If #><# If String.IsNullOrEmpty(Pr_Set) Then #>ReadOnly <# ElseIf String.IsNullOrEmpty(Pr_Get) Then #>WriteOnly <# End If #>Property <#= Sn(Pr_Name) #>(<# If Not Pr_Parametered Then #>) As <#= Pr_Type #><# If Hv(Pr_Implement) Then #> Implements <#= Pr_Implement #><# End If #><# Else #> _<# End If #>
+<# Id(+0) #><# If Pr_Parametered Then #><# Id(+1) #><# Lf(+1) #><# For i = 0 to Ln(Pr_ParameterNames) - 1 #>
+<# Id(+0) #>ByVal <#= Pr_ParameterName #> As <#= Pr_ParameterType #><# If i < Ln(Pr_ParameterNames) - 1 Then #>,<# End If #> _
+<# Id(+0) #><# Next #>
+<# Id(-1) #>) As <#= Pr_Type #><# If Hv(Pr_Implement) Then #> Implements <#= Pr_Implement #><# End If #><# End If #>
+<# Lf(+1) #>
+<# Id(+1) #><# If Hv(Pr_Get) Then #>
+<# Id(+0) #>Get
+<# Id(+1) #><#= Pr_Get #>
+<# Id(-1) #>End Get
+<# Id(+0) #><# End If #>
+<# Id(+0) #><# If Hv(Pr_Set) Then #>
+<# Id(+0) #>Set(value As <#= Pr_Type #>)
+<# Id(+1) #><#= Pr_Set #>
+<# Id(-1) #>End Set
+<# Id(+0) #><# End If #>
+<# Id(-1) #>End Property<#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INTERNAL VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private i As Integer = 0										' Current Iterative Index
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Pr_Visibility As String									' Visibility of the Property
+	Public Pr_Name As String										' Name of the Property (n)
+	Public Pr_Description As String									' Description of the Property (d)
+	Public Pr_Remark As String										' Remark for the Property (r)
+	Public Pr_Type As String										' Type of the Property (t)
+	Public Pr_Header As String										' Header of the Property
+	Public Pr_Get As String											' Get Statement of the Property (g)
+	Public Pr_Set As String											' Set Statement of the Property (s)
+	Public Pr_Implement As String									' Implements Statement of the Property (i)
+	Public Pr_Default As Boolean									' Default of the Property
+	Public Pr_Shadow As Boolean										' Shadow of the Property
+	Public Pr_ParameterNames As String() = New String() {}			' Parameter Names for the Property (p)
+	Public Pr_ParameterTypes As String() = New String() {}			' Parameter Types for the Property (q)
+	Public Pr_Override As Boolean									' Override of the Method (o)
+	Public Pr_Overridable As Boolean								' Overridable of the Method (s)
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' 
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE PROPERTIES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Pr_Parametered() As Boolean
+		Get
+			Return Ln(Pr_ParameterNames) > 0
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_ParameterName() As String
+		Get
+			Return Av(Pr_ParameterNames, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Pr_ParameterType() As String
+		Get
+			Return Av(Pr_ParameterTypes, i, "System.Object")
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

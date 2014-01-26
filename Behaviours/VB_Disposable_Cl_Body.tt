@@ -1,0 +1,42 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #>#Region " IDisposable Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Variables.tt", False, Cp("Va_Visibility", "Private"), Ca("Va_Names", "IDisposable_DisposedCalled"), Ca("Va_Types", "System.Boolean")) #>
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Public Methods "
+<# Lf(+1) #>
+<# Id(+1) #>Public Sub IDisposable_Dispose() Implements IDisposable.Dispose
+<# Lf(+1) #>
+<# Id(+1) #>If Not IDisposable_DisposedCalled Then
+<# Lf(+1) #>
+<# Id(+1) #>IDisposable_DisposedCalled = True
+<# Id(+0) #><# For i = 0 To Ln(Di_Fields) - 1 #><# Lf(+1) #>
+<# Id(+0) #>If Not <#= Di_Field #> Is Nothing Then CType(<#= Di_Field #>, IDisposable).Dispose()
+<# Lf(+1) #>
+<# Id(+0) #><# Next #>
+<# Id(+0) #><# If Hv(Di_PostCall) Then #><#= Di_PostCall #><# Lf(+1) #><# End If #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End Sub
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INTERNAL VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private i As Integer = 0										' Current Iterative Index
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Di_Fields As String()									' Property Names for 'Disposable' Properties
+	Public Di_PostCall As String									' Name of Method to be called to complete Disposing
+
+	Public ReadOnly Property Di_Field() As String
+		Get
+			Return Av(Di_Fields, i)
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

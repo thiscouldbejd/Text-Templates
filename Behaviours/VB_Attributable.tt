@@ -1,0 +1,7 @@
+﻿<#+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public At_Targets As String										' What this Usage Attribute Targets
+	Public At_Multiple As String									' Whether it can be applied Multiple Times
+	Public At_Inherited As String									' Whether it is Inherited
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

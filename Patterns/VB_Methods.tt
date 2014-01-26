@@ -1,0 +1,12 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Methods.tt" #>
+<# Id(+0) #>#Region " <#= Md_Visibility #> Methods "
+<# Lf(+1) #>
+<# Id(+1) #><# For Md_Current = 0 to Ln(Md_Names) - 1 #>
+<# Id(+0) #><#= Ct("Patterns", "VB_Method.tt", True) #>
+<# Lf(+1) #><# Next   #>
+<# Id(-1) #>#End Region<#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Md_Visibility As String = "Public"						' Visibility of the Methods
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

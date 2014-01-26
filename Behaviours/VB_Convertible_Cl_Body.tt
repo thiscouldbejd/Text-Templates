@@ -1,0 +1,44 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #>#Region " IConvertible Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Methods.tt", False, Cp("Md_Visibility", "Public"), Ca("Md_Names", "IConvertible_GetTypeCode", "IConvertible_ToType"), _
+	Ca("Md_ReturnTypes", "System.TypeCode", "System.Object"), Ca("Md_Implements", "System.IConvertible.GetTypeCode", "System.IConvertible.ToType"), _
+	Ca("Md_Bodies", "Return TypeCode.Object", "Return Leviathan.Persistance.Convertible.ConvertibleWrapper.ConvertToType(Me, conversionType, provider)"), _
+	Ca("Md_ParametersNames", New String() {}, New String() {"conversionType", "provider"}), _
+	Ca("Md_ParametersTypes", New String() {}, New String() {"System.Type", "System.IFormatProvider"}), Ca("Md_Descriptions", "", "")) #>
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Conversion Methods "
+<# Lf(+1) #>
+<# Dim Ty_Names As String() = New String() {"Boolean", "Byte", "Char", "DateTime", "Decimal", "Double", "Int16", "Int32", "Int64", "SByte", "Single", "String", "UInt16", "UInt32", "UInt64"} #>
+<# Id(+1) #><# For Each Ty_Name As String In Ty_Names #>
+<# If String.Compare(Ty_Name, "String", False) = 0 Then #>
+<# Id(+0) #>Public Overloads Overridable Function IConvertible_To<#= Ty_Name #>( _
+<# Else   #>
+<# Id(+0) #>Public Overridable Function IConvertible_To<#= Ty_Name #>( _
+<# End If #>
+<# Id(+1) #>ByVal provider As System.IFormatProvider _
+<# Id(-1) #>) As System.<#= Ty_Name #> Implements System.IConvertible.To<#= Ty_Name #>
+<# Lf(+1) #>
+<# Id(+1) #><# If String.Compare(Ty_Name, "String", False) = 0 OrElse String.Compare(Ty_Name, "System.String", False) = 0 Then #>
+<# Id(+1) #>Return objectToConvert.ToString(provider)
+<# Id(+0) #><# Else   #>
+<# Id(+1) #>If objectToConvert.GetType Is GetType(String) Then
+<# Lf(+1) #>
+<# Id(+1) #>Dim bol_Success As Boolean
+<# Lf(+1) #>
+<# Lf(+1) #>Dim retObject As Object = Leviathan.Commands.FromString.GetInstance.Parse(Me, bol_Success, GetType(<#= Ty_Name #>))
+<# Lf(+1) #>
+<# Id(+0) #>If bol_Success Then Return retObject
+<# Lf(+1) #>
+<# Id(-1) #>Else
+<# Lf(+1) #>
+<# Id(+0) #>Return Nothing
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Id(+0) #><# End If #>
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #><# Next   #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #>

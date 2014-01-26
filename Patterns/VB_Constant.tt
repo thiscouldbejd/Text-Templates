@@ -1,0 +1,13 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #><#= St(Cn_Description) #>
+<# Id(+0) #><#= Rt(Cn_Remark) #>
+<# Id(+0) #><#= Cn_Visibility #> Const <#= Sn(Cn_Name) #> As String = "<#= Cn_Value #>"<#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Cn_Visibility As String = "Public"						' Visibility of the Constant
+	Public Cn_Name As String										' Name of the Constant (n)
+	Public Cn_Value As String										' Value of the Constant (v)
+	Public Cn_Description As String									' Description of the Constant (d)
+	Public Cn_Remark As String										' Remark for the Constant (r)
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

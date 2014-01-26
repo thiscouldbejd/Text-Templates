@@ -1,0 +1,96 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Behaviours\VB_Collection.tt" #>
+<# Id(+0) #>#Region " Collection Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Properties.tt", False, Cp("Pr_Visibility", "Public"), Ca("Pr_Names", "Item"), Ca("Pr_Types", Cl_ElementType), _
+	Ca("Pr_Gets", "Return MyBase.Item(index)"), Ca("Pr_Sets", "MyBase.Item(index) = value"), Ca("Pr_Descriptions", "Provides A Strongly Typed Index Property"), _
+	Ca("Pr_Defaults", True), Ca("Pr_Shadows", True), Ca("Pr_ParametersNames", New String() {"index"}), Ca("Pr_ParametersTypes", New String() {"System.Int32"})) #>
+<# Lf(+1) #><# If Ln(Cl_ItemProperties) > 0 OrElse Ln(Cl_ItemsProperties) > 0 Then #>
+<# Id(+0) #>#Region " Item/Items Properties "
+<# Id(+1) #><# For i = 0 To Ln(Cl_ItemProperties) - 1 #><# Lf(+1) #>
+<# Id(+0) #><# If Not Hv(Cl_ItemName) Then #>Default <# End If #>Public <# If Not Hv(Cl_ItemName) Then #>Shadows <# End If #>Property <# If Hv(Cl_ItemName) Then #><#= Cl_ItemName #><# Else #>Item<# End If #>( _
+<# Id(+1) #>ByVal <#= String.Format("_{0}", Cl_ItemProperty)  #> As <#= Cl_ItemType #> _
+<# Id(-1) #>) As <#= Cl_ElementType #>
+<# Id(+1) #>Get
+<# Id(+1) #>For i As Integer = 0 To Me.Count - 1
+<# Id(+1) #>If Leviathan.Comparison.Comparer.AreEqual(<#= String.Format("_{0}", Cl_ItemProperty) #>, Me(i).<#= Cl_ItemProperty #>) Then
+<# Id(+1) #>Return Me(i)
+<# Id(-1) #>End If
+<# Id(-1) #>Next
+<# Id(+0) #>Return Nothing
+<# Id(-1) #>End Get
+<# Id(+0) #>Set(ByVal value As <#= Cl_ElementType #>)
+<# Id(+1) #>For i As Integer = 0 To Me.Count - 1
+<# Id(+1) #>If Leviathan.Comparison.Comparer.AreEqual(<#= String.Format("_{0}", Cl_ItemProperty) #>, Me(i).<#= Cl_ItemProperty #>) Then
+<# Id(+1) #>Me(i) = value
+<# Id(+0) #>Exit For
+<# Id(-1) #>End If
+<# Id(-1) #>Next
+<# Id(-1) #>End Set
+<# Id(-1) #>End Property
+<# Id(+0) #><# Next #>
+<# Id(+0) #><# For i = 0 To Ln(Cl_ItemsProperties) - 1 #><# Lf(+1) #>
+<# Id(+0) #>Public Overloads ReadOnly Property Items( _
+<# Id(+1) #>ByVal <#= String.Format("_{0}", Cl_ItemsProperty) #> As <#= Cl_ItemsType #> _
+<# Id(-1) #>) As <#= Cl_ElementType #>()
+<# Id(+1) #>Get
+<# Id(+1) #>Dim aryReturn As New List(Of <#= Cl_ElementType #>)
+<# Lf(+1) #>
+<# Id(+0) #>For i As Integer = 0 To Me.Count - 1
+<# Id(+1) #>If Leviathan.Comparison.Comparer.AreEqual(<#= String.Format("_{0}", Cl_ItemsProperty) #>, Me(i).<#= Cl_ItemsProperty #>) Then
+<# Id(+1) #>aryReturn.Add(Me(i))
+<# Id(-1) #>End If
+<# Id(-1) #>Next
+<# Lf(+1) #>
+<# Id(+0) #>Return aryReturn.ToArray()
+<# Id(-1) #>End Get
+<# Id(-1) #>End Property
+<# Id(+0) #><# Next #>
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #><# End If #>
+<# Id(-1) #>#End Region<# Lf(+1) #><#+ 
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INTERNAL VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private i As Integer = 0										' Current Iterative Index
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Cl_ItemNames As String()
+	Public Cl_ItemProperties As String()							' Property Names for 'Item' Properties
+	Public Cl_ItemTypes As String()									' Item Types for 'Item' Properties
+	Public Cl_ItemsProperties As String()							' Property Names for 'Items' Properties
+	Public Cl_ItemsTypes As String()								' Item Types for 'Items' Properties
+
+	Public ReadOnly Property Cl_ItemName() As String
+		Get
+			Return Av(Cl_ItemNames, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Cl_ItemProperty() As String
+		Get
+			Return Av(Cl_ItemProperties, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Cl_ItemType() As String
+		Get
+			Return Av(Cl_ItemTypes, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Cl_ItemsProperty() As String
+		Get
+			Return Av(Cl_ItemsProperties, i)
+		End Get
+	End Property
+
+	Public ReadOnly Property Cl_ItemsType() As String
+		Get
+			Return Av(Cl_ItemsTypes, i)
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

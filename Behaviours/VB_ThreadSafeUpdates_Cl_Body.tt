@@ -1,0 +1,36 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# Id(+0) #>#Region " Thread-Safe Updates Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Variables.tt", False, Cp("Va_Visibility", "Private"), _
+  Ca("Va_Names", Aa(Af(Pr_ThreadSafes, LOCK_FORMAT), Af(Pr_ThreadSafes, "{0}_HASVALUE"))), _
+  Ca("Va_Types", Aa(Ac(Ln(Pr_ThreadSafes), "New System.Object"), Ac(Ln(Pr_ThreadSafes), "System.Boolean")))) #>
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Public Update Methods "
+<# Lf(+1) #>
+<# Id(+1) #><# For i As Integer = 0 to Ln(Pr_ThreadSafes) - 1 #><# If SetCurrentField(Av(Pr_ThreadSafes, i)) Then #>
+<# Id(+0) #>Public Function ThreadSafeUpdate<#= Pr_Name #>( _
+<# Id(+1) #>ByVal <#= Pa_Name #> As <#= Fd_Type #> _
+<# Id(-1) #>) As Boolean
+<# Lf(+1) #>
+<# Id(+1) #>SyncLock <#= String.Format(LOCK_FORMAT, Pr_Name) #>
+<# Id(+1) #>If Not <#= String.Format(HASVALUE_FORMAT, Pr_Name) #> OrElse Not Leviathan.Comparison.Comparer.AreEqual(<#= Fd_Get #>, <#= Pa_Name #>) Then
+<# Id(+1) #><#= Fd_Set #> = <#= Pa_Name #>
+<# Id(+0) #><#= String.Format(HASVALUE_FORMAT, Pr_Name) #> = True
+<# Id(+0) #>Return True
+<# Id(-1) #>Else
+<# Id(+1) #>Return False
+<# Id(-1) #>End If
+<# Id(-1) #>End SyncLock
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #><# End If #><# Next   #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Const LOCK_FORMAT As String = "{0}_LOCK"					' Format for Lock Variables
+	Public Const HASVALUE_FORMAT As String = "{0}_HASVALUE"			' Format for Has Value Variables
+	Public Pr_ThreadSafes As String()								' Names of the Thread-Safe Properties
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

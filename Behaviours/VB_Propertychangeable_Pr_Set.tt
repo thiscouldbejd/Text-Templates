@@ -1,0 +1,2 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# If Hv(Pr_Set) Then #>INotifyPropertyChanged_RaiseChanged(<#= Cn_Name #>)<# End If #>

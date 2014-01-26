@@ -1,0 +1,86 @@
+﻿<#@ template language="VB" hostspecific="True" #>
+<# Id(+0) #>#Region " IEditableObject Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Variables.tt", False, Cp("Va_Visibility", "Private"), Ca("Va_Names", "IEditableObject_ExistingValues", "IEditableObject_ExistingMembers", "IEditableObject_Editing"), _
+	Ca("Va_Types", "System.Collections.IList", "Leviathan.Inspection.MemberAnalyser()", "System.Boolean")) #>
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Private Methods "
+<# Lf(+1) #>
+<# Id(+1) #>Private Function IEditableObject_GetExistingMembers() As Leviathan.Inspection.MemberAnalyser()
+<# Lf(+1) #>
+<# Id(+1) #>If IEditableObject_ExistingMembers Is Nothing Then
+<# Lf(+1) #>
+<# Id(+1) #>IEditableObject_ExistingMembers = Leviathan.Inspection.TypeAnalyser.GetInstance(Me.GetType) _
+<# Id(+1) #>.ExecuteQuery(Leviathan.Inspection.AnalyserQuery.QUERY_VARIABLES)
+<# Lf(+1) #>
+<# Id(-1) #>If IEditableObject_ExistingMembers Is Nothing Then IEditableObject_ExistingMembers = New Leviathan.Inspection.MemberAnalyser() {}
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #>Return IEditableObject_ExistingMembers
+<# Lf(+1) #>
+<# Id(-1) #>End Function
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Public Methods "
+<# Lf(+1) #>
+<# Id(+1) #>Public Sub IEditableObject_BeginEdit() Implements System.ComponentModel.IEditableObject.BeginEdit
+<# Lf(+1) #>
+<# Id(+1) #>If Not IEditableObject_Editing Then
+<# Lf(+1) #>
+<# Id(+1) #>IEditableObject_Editing = True
+<# Lf(+1) #>
+<# Id(+0) #>Dim members As Leviathan.Inspection.MemberAnalyser() = IEditableObject_GetExistingMembers()
+<# Lf(+1) #>
+<# Id(+0) #>If Not members Is Nothing Then
+<# Lf(+1) #>
+<# Id(+1) #>For i As Integer = 0 To members.Length - 1
+<# Lf(+1) #>
+<# Id(+1) #>IEditableObject_ExistingValues.Add(members(i).Read(Me))
+<# Lf(+1) #>
+<# Id(-1) #>Next
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End Sub
+<# Lf(+1) #>
+<# Id(+0) #>Public Sub IEditableObject_CancelEdit() Implements System.ComponentModel.IEditableObject.CancelEdit
+<# Lf(+1) #>
+<# Id(+1) #>If IEditableObject_Editing Then
+<# Lf(+1) #>
+<# Id(+1) #>Dim aryValues As Object() = Array.CreateInstance(GetType(Object), IEditableObject_ExistingValues.Count)
+<# Id(+0) #>IEditableObject_ExistingValues.CopyTo(IEditableObject_ExistingValues, 0)
+<# Lf(+1) #>
+<# Id(+0) #>Dim members As Leviathan.Inspection.MemberAnalyser() = IEditableObject_GetExistingMembers()
+<# Lf(+1) #>
+<# Id(+0) #>Dim cancel As Boolean = True
+<# Lf(+1) #>
+<# Id(+0) #>If Not members Is Nothing Then
+<# Id(+1) #>For i As Integer = 0 To members.Length - 1
+<# Id(+1) #>If Not members(i).Write(Me, aryValues(i)) Then
+<# Id(+1) #>cancel = False
+<# Id(+0) #>Exit For
+<# Id(-1) #>End If
+<# Id(-1) #>Next
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(+0) #>IEditableObject_EndEdit()
+<# Lf(+1) #>
+<# Id(-1) #>End If
+<# Lf(+1) #>
+<# Id(-1) #>End Sub
+<# Lf(+1) #>
+<# Id(+0) #>Public Sub IEditableObject_EndEdit() Implements System.ComponentModel.IEditableObject.EndEdit
+<# Lf(+1) #>
+<# Id(+1) #>IEditableObject_ExistingValues.Clear()
+<# Lf(+1) #>
+<# Id(+0) #>IEditableObject_Editing = False
+<# Lf(+1) #>
+<# Id(-1) #>End Sub
+<# Lf(+1) #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #>

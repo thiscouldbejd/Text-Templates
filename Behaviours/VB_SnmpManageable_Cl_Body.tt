@@ -1,0 +1,14 @@
+﻿<#@ template language="VB" hostspecific="True" #><# If Hv(Pr_Community) #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# Id(+0) #>#Region " ISnmpManageable Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Properties.tt", False, Ca("Pr_Names", "ISnmpManageable_Target", "ISnmpManageable_Community"), _
+	Ca("Pr_Types", "System.Net.IPAddress()", "System.String"), Ca("Pr_Implements", "Caerus.Snmp.ISnmpManageable.Target", "Caerus.Snmp.ISnmpManageable.Community"), _
+	Ca("Pr_Gets", String.Format("Return {0}", Pr_DeviceName), String.Format("Return {0}", Pr_Community))) #>
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #><# End If #><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Pr_DeviceName As String = "Name.IpAddresses"				' Device Name Property
+	Public Pr_Community As String = "SnmpCommunity"					' The Name of the Property Containing the SNMP Community (REQUIRED)
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

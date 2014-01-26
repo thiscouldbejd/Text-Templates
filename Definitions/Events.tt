@@ -1,0 +1,68 @@
+﻿<#+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Ev_Current As Integer = 0								' Used to Track the 'Current' Event
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' METHOD VARIABLES												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Ev_Descriptions As String()								' Descriptions of the Events (d)
+	Public Ev_Implements As String()								' Implements of the Events (i)
+	Public Ev_Names As String()										' Names of the Events (n)
+	Public Ev_ParametersNames As String()()							' Parameter Names of the Events (p)
+	Public Ev_ParametersTypes As String()()							' Parameter Types of the Events (t)
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' 
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' FIELD PROPERTIES												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Ev_Description As String				' Description of the Current Event
+		Get
+			Return Av(Ev_Descriptions, Ev_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property Ev_Name As String						' Name of the Current Event
+		Get
+			Return Av(Ev_Names, Ev_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property Ev_ParameterNames As String()			' Parameter Names of the Current Event
+		Get
+			Return Av(Ev_ParametersNames, Ev_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property Ev_ParameterTypes As String()			' Parameter Types of the Current Event
+		Get
+			Return Av(Ev_ParametersTypes, Ev_Current)
+		End Get
+	End Property
+	
+	Public ReadOnly Property Ev_Implement As String					' Implements of the Current Event
+		Get
+			Return Av(Ev_Implements, Ev_Current)
+		End Get
+	End Property
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' ADDITION METHODS												'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Sub Add_Event( _
+		Optional ByVal d As String = Nothing, _
+		Optional ByVal i As String = Nothing, _
+		Optional ByVal n As String = Nothing, _
+		Optional ByVal p As String() = Nothing, _
+		Optional ByVal t As String() = Nothing, _
+	)																' Method to Add an Event
+
+		Ao(Ev_Descriptions, d)
+		Ao(Ev_Implements, i)
+		Ao(Ev_Names, n)
+		Ao(Ev_ParametersNames, p)
+		Ao(Ev_ParametersTypes, t)
+
+	End Sub #>

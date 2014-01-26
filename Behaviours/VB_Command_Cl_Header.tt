@@ -1,0 +1,10 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #>
+<# Id(+0) #><Leviathan.Commands.Command(ResourceContainingType:=GetType(<#= Cl_Name #>), ResourceName:="<#= Cm_Resource #>", Name:="<#= Cm_Name #>", Description:="<#= Cm_Description #>", Hidden:=<#= Cm_Hidden #>)> _<#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Cm_Name As String										' What this Command is Called
+	Public Cm_Description As String									' Description of the Command
+	Public Cm_Resource As String = "CommandDetails"					' Resource Location of the Command Details
+	Public Cm_Hidden As String = "False"							' Whether the Command is Hidden
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

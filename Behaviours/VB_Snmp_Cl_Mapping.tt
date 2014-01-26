@@ -1,0 +1,62 @@
+﻿<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Definitions\Class.tt" #><#@ include file="%TEMPLATES_PATH%\Definitions\Fields.tt" #>
+<# Id(+0) #><?xml version="1.0" encoding="utf-8" ?>
+<# Id(+0) #><Caerus.Snmp.ObjectMapping>
+<# Lf(+1) #>
+<# Id(+1) #><# If Hv(Mp_Version) Then #><Version><#= Mp_Version #></Version><# Lf(+2) #><# End If #>
+<# Id(+1) #><# If Hv(Cl_Inherits) Then #><InheritsMappings>True</InheritsMappings><# Lf(+2) #><# End If #>
+<# Id(+0) #><FieldMappings>
+<# Lf(+1) #>
+<# Id(+1) #><Caerus.Snmp.FieldMapping->
+<# Lf(+1) #>
+<# Id(+1) #><# For Fd_Current = 0 to Ln(Fd_Names) - 1 #>
+<# Id(+0) #><# If Not Fd_Mapping("Snmp") Is Nothing AndAlso Not Fd_Type.EndsWith("Collection") Then #>
+<# Id(+0) #><# For i As Integer = 0 to Ln(Fd_Mapping("Snmp")) - 1 #>
+<# Id(+0) #><Caerus.Snmp.FieldMapping>
+<# Id(+1) #><Name><# If Not Fd_Mapping("Snmp_Field") Is Nothing AndAlso Ln(Fd_Mapping("Snmp_Field")) > i AndAlso Hv(Fd_Mapping("Snmp_Field")(i)) Then #><# If Fd_Mapping("Snmp_Field")(i).Contains("{0}") Then #><#= String.Format(Fd_Mapping("Snmp_Field")(i), Fd_Set) #><# Else #><#= Fd_Mapping("Snmp_Field")(i) #><# End If #><# Else #><#= Fd_Set #><# End If #></Name>
+<# Id(+0) #><Value><#= Fd_Mapping("Snmp")(i) #></Value>
+<# Id(+0) #><# If Not Fd_Mapping("Snmp_OidToEnum") Is Nothing AndAlso Ln(Fd_Mapping("Snmp_OidToEnum")) > i AndAlso Hv(Fd_Mapping("Snmp_OidToEnum")(i)) Then #><OidToEnum><#= Fd_Mapping("Snmp_OidToEnum")(i) #></OidToEnum><# Lf(+1) #><# End If #>
+<# Id(+0) #><# If Not Fd_Mapping("Snmp_Transient") Is Nothing AndAlso Ln(Fd_Mapping("Snmp_Transient")) > i AndAlso Hv(Fd_Mapping("Snmp_Transient")(i)) Then #><Transient><#= Fd_Mapping("Snmp_Transient")(i) #></Transient><# Lf(+1) #><# End If #>
+<# Id(-1) #></Caerus.Snmp.FieldMapping>
+<# Lf(+1) #><# Next #><# End If #><# Next #>
+<# Id(-1) #></Caerus.Snmp.FieldMapping->
+<# Lf(+1) #>
+<# Id(-1) #></FieldMappings>
+<# Lf(+1) #>
+<# Id(+0) #><TableMappings>
+<# Lf(+1) #>
+<# Id(+1) #><Caerus.Snmp.TableMapping->
+<# Lf(+1) #>
+<# Id(+1) #><# For Fd_Current = 0 to Ln(Fd_Names) - 1 #>
+<# Id(+0) #><# If Not Fd_Mapping("Snmp") Is Nothing AndAlso Fd_Type.EndsWith("Collection") Then #>
+<# Id(+0) #><Caerus.Snmp.TableMapping>
+<# Lf(+1) #>
+<# Id(+1) #><Name><#= Pr_Name #></Name>
+<# Lf(+1) #>
+<# Id(+0) #><MappingType><#= Fd_Type #></MappingType>
+<# Lf(+1) #>
+<# Id(+0) #><FieldMappings>
+<# Lf(+1) #>
+<# Id(+1) #><Caerus.Snmp.FieldMapping->
+<# Lf(+1) #>
+<# Id(+0) #><# For i As Integer = 0 to Ln(Fd_Mapping("Snmp")) - 1 #>
+<# Id(+1) #><Caerus.Snmp.FieldMapping>
+<# Id(+1) #><Name><# If Not Fd_Mapping("Snmp_Field") Is Nothing AndAlso Ln(Fd_Mapping("Snmp_Field")) > i AndAlso Hv(Fd_Mapping("Snmp_Field")(i)) Then #><# If Fd_Mapping("Snmp_Field")(i).Contains("{0}") Then #><#= String.Format(Fd_Mapping("Snmp_Field")(i), Fd_Set) #><# Else #><#= Fd_Mapping("Snmp_Field")(i) #><# End If #><# Else #><#= Fd_Set #><# End If #></Name>
+<# Id(+0) #><Value><#= Fd_Mapping("Snmp")(i) #></Value>
+<# Id(-1) #></Caerus.Snmp.FieldMapping>
+<# Lf(+1) #><# Next #>
+<# Id(-1) #></Caerus.Snmp.FieldMapping->
+<# Lf(+1) #>
+<# Id(-1) #></FieldMappings>
+<# Lf(+1) #>
+<# Id(-1) #></Caerus.Snmp.TableMapping>
+<# Lf(+1) #><# End If #><# Next #>
+<# Id(-1) #></Caerus.Snmp.TableMapping->
+<# Lf(+1) #>
+<# Id(-1) #></TableMappings>
+<# Lf(+1) #>
+<# Id(-1) #></Caerus.Snmp.ObjectMapping><#+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Mp_Version As String										' Mapping Version Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

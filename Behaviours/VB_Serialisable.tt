@@ -1,0 +1,16 @@
+﻿<#+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Cl_XmlNamespace As String								' Namespace of the Xml Serialisation
+	Public Se_Full As String										' Whether to Include Serialisation Code
+
+	Public ReadOnly Property Se_IncludeCode() As Boolean
+		Get
+			If Hv(Se_Full) Then
+				Return Boolean.Parse(Se_Full)
+			Else
+				Return True
+			End If
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>
