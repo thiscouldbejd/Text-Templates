@@ -1,6 +1,5 @@
 ﻿<#@ import namespace="System.Collections" #>
 <#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="System.Environment" #>
 <#@ import namespace="System.IO" #>
 <#@ import namespace="System.IO.Path" #>
 <#@ import namespace="System.Reflection" #>
@@ -9,57 +8,37 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="Microsoft.VisualStudio.TextTemplating" #><#+
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	' TEMPLATE CONSTANTS											'
-	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	Public Const FUNCTIONS_VERSION As Integer = 1
-	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	' TEMPLATE VARIABLES											'
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	Public ReadOnly Property TEMPLATES_PATH As String
-		Get
-			If Not String.IsNullOrEmpty(GetEnvironmentVariable("TEMPLATES_PATH", EnvironmentVariableTarget.User)) Then
-				Return GetEnvironmentVariable("TEMPLATES_PATH", EnvironmentVariableTarget.User)
-			ElseIf Not String.IsNullOrEmpty(GetEnvironmentVariable("TEMPLATES_PATH", EnvironmentVariableTarget.Process)) Then
-				Return GetEnvironmentVariable("TEMPLATES_PATH", EnvironmentVariableTarget.Process)
-			ElseIf Not String.IsNullOrEmpty(GetEnvironmentVariable("TEMPLATES_PATH", EnvironmentVariableTarget.Machine)) Then
-				Return GetEnvironmentVariable("TEMPLATES_PATH", EnvironmentVariableTarget.Machine)
-			Else
-				Return Environment.CurrentDirectory
-			End If
-		End Get
-	End Property
-
-	Public TEMPLATES_FORMAT_PATH As String = TEMPLATES_PATH & "\{0}\{1}"
+	Public UNSAFE_NAMES As String() = New String() {"Function", "Alias", "Method", "Property", "Variable", "Single", "String", "Double", "Integer", _
+		"Long", "Short", "Module", "Class", "Static", "Boolean", "End", "Date", "ReadOnly", "WriteOnly", "Private", "Protected", "Friend", "Public", _
+		"Implements", "Namespace", "Error", "Nothing", "Select", "Exit", "Like", "In", "And", "Or", "Operator", "Object", "New", "To", "Return", _
+		"Stop", "Option", "Imports", "Default", "Event", "On", "Type", "Next"}
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	' TEMPLATE DESCRIPTION											'
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	' TOTAL TEMPLATE LENGTH SHOULD BE <=500 lines (Including ALL Comments)
 	' Aa = Aggregate Arrays | Ac = Create Array | Ae = Value Exists in Array | Af = Format Array Strings | Ao = Add Object To Array | Av = Get Array Value
-	' Cd = Create Directive | Co = Comment Prefix | Ca = Create Array Template Parameter | Cp = Create Template Parameter | Ct = Call Template
-	' Dd = DeHydrate Data | Hd = Hydrate Data | Wd = Wedge Data
-	' Ga = Generator Attribute | Gd = Generator Date Tag | Ge = Generator Tag | Gf = Generator Functions Tag
+	' Cd = Create Directive | Co = Comment Prefix | Ca = Create Array Template Parameter | Cp = Create Template Parameter | Ct = Call Template | Cl = Clean Template Path
+	' Dd = DeHydrate Data | Hd = Hydrate Data | Wd = Wedge Data | Ga = Generator Attribute | Gd = Generator Date Tag | Ge = Generator Tag | Gf = Generator Functions Tag
 	' Gs = Generator Source Tag | Gt = Generator Template Tag | Gv = Generator Version Tag
-	' Hv = Has String Value | Id = Indent Output
-	' La = Enum for Output Language | Ln = Get Array Length | Lf = Line-Feed Output
-	' Pt = Parameter Tag | Rt = Remarks Tag
-	' Sn = Safe Member Name | St = Summary Tag
-	' Tp = Entry Template Path
+	' Hv = Has String Value | Id = Indent Output | La = Enum for Output Language | Ln = Get Array Length | Lf = Line-Feed Output
+	' Pt = Parameter Tag | Rt = Remarks Tag | Sn = Safe Member Name | St = Summary Tag
+	' Tp = Entry Template Path | Ts = Templates Directory Path | En = Environmental Variable Value
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	' PUBLIC CONSTANTS												'
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	Public Const ANGLE_BRACKET_END As Char = ">", ANGLE_BRACKET_START As Char = "<"
-	Public Const ASTERISK As Char = "*", HASH As Char = "#", BACK_SLASH As Char = "\", FORWARD_SLASH As Char = "/"
-	Public Const BRACE_END As Char = "}", BRACE_START As Char = "{", BRACKET_END As Char = ")", BRACKET_START As Char = "("
-	Public Const COLON As Char = ":", SEMI_COLON As Char = ";", COMMA As Char = ",", FULL_STOP As Char = "."
-	Public Const EXCLAMATION_MARK As Char = "!", QUESTION_MARK As Char = "?", EQUALS_SIGN As Char = "=", PLUS As Char = "+"
-	Public Const HYPHEN As Char = "-", UNDER_SCORE As Char = "_", PERCENTAGE_MARK As Char = "%", AT_SIGN As Char = "@"
-	Public Const PIPE As Char = "|", SPACE As Char = " ", QUOTE_SINGLE As Char = "'", QUOTE_DOUBLE As Char = """"
+	Public Const FUNCTIONS_VERSION As Integer = 1
+	Public Const ENV_TEMPLATES_PATH As String = "TEMPLATES_PATH", ENV_DEVELOPMENT_PATH As String = "DEVELOPMENT_PATH"
+	Public Const ANGLE_BRACKET_END As Char = ">", ANGLE_BRACKET_START As Char = "<", ASTERISK As Char = "*", HASH As Char = "#"
+	Public Const BACK_SLASH As Char = "\", FORWARD_SLASH As Char = "/", BRACE_END As Char = "}", BRACE_START As Char = "{"
+	Public Const BRACKET_END As Char = ")", BRACKET_START As Char = "(", COLON As Char = ":", SEMI_COLON As Char = ";"
+	Public Const COMMA As Char = ",", FULL_STOP As Char = ".", EXCLAMATION_MARK As Char = "!", QUESTION_MARK As Char = "?"
+	Public Const EQUALS_SIGN As Char = "=", PLUS As Char = "+", HYPHEN As Char = "-", UNDER_SCORE As Char = "_", PERCENTAGE_MARK As Char = "%"
+	Public Const AT_SIGN As Char = "@", PIPE As Char = "|", SPACE As Char = " ", QUOTE_SINGLE As Char = "'", QUOTE_DOUBLE As Char = """"
 	Public Const SQUARE_BRACKET_END As Char = "]", SQUARE_BRACKET_START As Char = "["
 	Public Const INSTRUCTION_START As String = ANGLE_BRACKET_START & HASH, INSTRUCTION_END As String = HASH & ANGLE_BRACKET_END
 	Public Const DECLARATION_START As String = INSTRUCTION_START & AT_SIGN, DECLARATION_END As String = INSTRUCTION_END
@@ -73,12 +52,40 @@
 		CS = 2
 	End Enum
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
+	
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	' COMMENT FUNCTIONS												'
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private Function En( _
+		ByVal variable As String, _
+		ByRef value As String _
+	) As Boolean
+		value = System.Environment.ExpandEnvironmentVariables("%" & variable & "%")
+		If value = ("%" & variable & "%") Then
+			If Not String.IsNullOrEmpty(System.Environment.GetEnvironmentVariable(variable, System.EnvironmentVariableTarget.User)) Then
+				value = System.Environment.GetEnvironmentVariable(variable, System.EnvironmentVariableTarget.User)
+			ElseIf Not String.IsNullOrEmpty(System.Environment.GetEnvironmentVariable(variable, System.EnvironmentVariableTarget.Process)) Then
+				value = System.Environment.GetEnvironmentVariable(variable, System.EnvironmentVariableTarget.Process)
+			ElseIf Not String.IsNullOrEmpty(System.Environment.GetEnvironmentVariable(variable, System.EnvironmentVariableTarget.Machine)) Then
+				value = System.Environment.GetEnvironmentVariable(variable, System.EnvironmentVariableTarget.Machine)
+			Else
+				Return False
+			End If
+		End If
+		Return True
+	End Function
+
+	Private Function Cl( _
+		ByVal path As String _
+	) As String
+
+		Dim dev As String = String.Empty
+		If En(ENV_DEVELOPMENT_PATH, dev) AndAlso path.StartsWith(dev, StringComparison.OrdinalIgnoreCase) Then Return path.SubString(dev.Length) Else Return path 
+		
+	End Function
+
 	Private Function Co( _
-		language As La _
+		ByVal language As La _
 	) As String
 
 		Select Case language
@@ -134,12 +141,12 @@
 	' GENERATOR FUNCTIONS											'
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	Public Function Ga( _
-		tool As String, _
-		version As Integer, _
+		ByVal tool As String, _
+		ByVal version As Integer, _
 		Optional ByVal language As La = La.VB _
 	) As String
 
-		Return String.Format("<System.CodeDom.Compiler.GeneratedCode(""{0}"", ""{1}"")> _", tool, version)
+		Return String.Format("<System.CodeDom.Compiler.GeneratedCode(""{0}"", ""{1}"")> _", Cl(tool), version)
 
 	End Function
 
@@ -181,7 +188,7 @@
 		Optional ByVal language As La = La.VB _
 	) As String
 
-		Return String.Format(Co(language) & "<generator-source>{0}</generator-source>", Tp)
+		Return String.Format(Co(language) & "<generator-source>{0}</generator-source>", Cl(Tp))
 
 	End Function
 
@@ -191,7 +198,7 @@
 		Optional ByVal language As La = La.VB _
 	) As String
 
-		Return String.Format(Co(language) & "<generator-template>{0}</generator-template>", String.Format(TEMPLATES_FORMAT_PATH, templateDirectory, templateName))
+		Return String.Format(Co(language) & "<generator-template>{0}</generator-template>", Cl(String.Format(Ts("\{0}\{1}"), templateDirectory, templateName)))
 
 	End Function
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -200,32 +207,24 @@
 	' FORMATTING METHODS											'
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	Private Sub Id( _
-		numberOfTimes as Int32 _
+		ByVal numberOfTimes as Int32 _
 	)
 
 		Dim i as Int32 = 0
-
 		Do Until i = numberOfTimes
-
 			If numberOfTimes > 0 Then PushIndent(Microsoft.VisualBasic.vbTab) Else PopIndent()
 			If numberOfTimes > 0 Then i += 1 Else i -= 1
-
 		Loop
 
 	End Sub
 
 	Private Sub Lf( _
-		numberOfTimes as Int32 _
+		ByVal numberOfTimes as Int32 _
 	)
 
-		Dim i as Int32 = 0
-
-		Do Until i = numberOfTimes
-
+		For i As Integer = 0 To numberOfTimes - 1
 			WriteLine(String.Empty)
-			i += 1
-
-		Loop
+		Next
 
 	End Sub
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -239,18 +238,22 @@
 
 	End Function
 
-	Protected Function Cd( _
-		templateDirectory As String, _
-		templateName As String _
+	Protected Function Ts( _
+		Optional ByVal suffix As String = "" _
 	) As String
 
-		Dim directiveBuilder As New System.Text.StringBuilder()
+		Dim return_Val As String = String.Empty
+		If En(ENV_TEMPLATES_PATH, return_Val) Then Return return_Val & suffix Else Return Environment.CurrentDirectory & suffix
 
-		directiveBuilder.Append(DECLARATION_START).Append(SPACE).Append("include").Append(SPACE).Append("file").Append(EQUALS_SIGN)
-		directiveBuilder.Append(QUOTE_DOUBLE).Append(String.Format(TEMPLATES_FORMAT_PATH, templateDirectory, templateName)).Append(QUOTE_DOUBLE)
-		directiveBuilder.Append(SPACE).Append(DECLARATION_END)
+	End Function
 
-		Return directiveBuilder.ToString()
+	Protected Function Cd( _
+		ByVal templateDirectory As String, _
+		ByVal templateName As String _
+	) As String
+
+		Return New System.Text.StringBuilder().Append(DECLARATION_START).Append(SPACE).Append("include").Append(SPACE).Append("file").Append(EQUALS_SIGN) _
+		.Append(QUOTE_DOUBLE).Append(String.Format(Ts("\{0}\{1}"), templateDirectory, templateName)).Append(QUOTE_DOUBLE).Append(SPACE).Append(DECLARATION_END).ToString()
 
 	End Function
 
@@ -285,11 +288,7 @@
 
 		Dim template_Files As FileInfo() = New FileInfo() {}
 		Dim template_Return As New StringBuilder()
-		Dim guidKey As String = Guid.NewGuid().ToString("N")
-
-		Dim fBuilder As New StringBuilder()
-		fBuilder.Append(Cd("Code", "Functions.tt")).Append(INSTRUCTION_START)
-		fBuilder.Append(String.Format("Hd" & BRACKET_START & QUOTE_DOUBLE & "{0}" & QUOTE_DOUBLE & BRACKET_END, guidKey)).Append(INSTRUCTION_END)
+		Dim guidKey As String = Guid.NewGuid().ToString("N"), fBuilt As String = New StringBuilder().Append(Cd("Code", "Functions.tt")).Append(INSTRUCTION_START).Append(String.Format("Hd" & BRACKET_START & QUOTE_DOUBLE & "{0}" & QUOTE_DOUBLE & BRACKET_END, guidKey)).Append(INSTRUCTION_END).ToString()
 
 		For Each template_Parameter As DictionaryEntry In template_Parameters
 
@@ -299,23 +298,21 @@
 
 		If template_Name.Contains(ASTERISK) Then
 
-			template_Files = New System.IO.DirectoryInfo(String.Format(TEMPLATES_FORMAT_PATH, template_Directory, "")).GetFiles(template_Name, SearchOption.AllDirectories)
+			template_Files = New System.IO.DirectoryInfo(String.Format(Ts("\{0}\{1}"), template_Directory, "")).GetFiles(template_Name, SearchOption.AllDirectories)
 
 		Else
 
-			If New FileInfo(String.Format(TEMPLATES_FORMAT_PATH, template_Directory, template_Name)).Exists Then _
-				template_Files = New FileInfo() {New FileInfo(String.Format(TEMPLATES_FORMAT_PATH, template_Directory, template_Name))}
+			If New FileInfo(String.Format(Ts("\{0}\{1}"), template_Directory, template_Name)).Exists Then _
+				template_Files = New FileInfo() {New FileInfo(String.Format(Ts("\{0}\{1}"), template_Directory, template_Name))}
 
 		End If
 
 		For Each template_File As FileInfo In template_Files
 
 			Dim template As String = System.Environment.ExpandEnvironmentVariables(File.ReadAllText(template_File.FullName))
+			Dim location As Integer = template.Substring(template.LastIndexOf(HASH & AT_SIGN) + 2).IndexOf(ANGLE_BRACKET_END) + template.LastIndexOf(HASH & AT_SIGN) + 3
 
-			Dim location As Integer = template.Substring(template.LastIndexOf(HASH & AT_SIGN) + 2) _
-				.IndexOf(ANGLE_BRACKET_END) + template.LastIndexOf(HASH & AT_SIGN) + 3
-
-			template = template.Insert(location, fBuilder.ToString)
+			template = template.Insert(location, fBuilt)
 
 			If Host.getHostOption("hasStack") Then Host.getHostOption("stack").AddTemplateCall(template_File.FullName, guidKey, template_Parameters)
 			Dim templateReturn As String = New Engine().ProcessTemplate(template, Host)
@@ -335,19 +332,17 @@
 	End Function
 
 	Protected Function Wd( _
-		value As Object, _
-		toType As System.Type _
+		ByVal value As Object, _
+		ByVal toType As System.Type _
 	) As Object
 
 		If toType.IsArray AndAlso value.GetType Is toType.GetElementType Then
-
 			Dim retArray As Array = Array.CreateInstance(toType.GetElementType, 1)
 			retArray(0) = value
 			Return retArray
-
+		Else
+			Return value
 		End If
-
-		Return value
 
 	End Function
 
@@ -361,9 +356,7 @@
 
 			Dim objectKey As String = fields(i).Name
 			If Hv(prefix) Then objectKey = prefix & objectKey
-
-			If Not LogicalGetData(objectKey) Is Nothing Then _
-				fields(i).SetValue(Me, Wd(LogicalGetData(objectKey), fields(i).FieldType))
+			If Not LogicalGetData(objectKey) Is Nothing Then fields(i).SetValue(Me, Wd(LogicalGetData(objectKey), fields(i).FieldType))
 
 		Next
 
@@ -372,16 +365,14 @@
 	Protected Function Dd() As DictionaryEntry()
 
 		Dim params As New List(Of DictionaryEntry)
-
 		Dim fields As FieldInfo() = Me.GetType().GetFields(BindingFlags.Instance Or BindingFlags.Public)
+		Dim props As PropertyInfo() = Me.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
 
 		For i As Integer = 0 To fields.Length - 1
 
 			If Not fields(i).Name = "Host" AndAlso Not fields(i).GetValue(Me) Is Nothing Then params.Add(Cp(fields(i).Name, fields(i).GetValue(Me)))
 
 		Next
-
-		Dim props As PropertyInfo() = Me.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
 
 		For i As Integer = 0 To props.Length - 1
 
@@ -433,11 +424,9 @@
 		ByVal Optional index As Integer = -1 _
 	) As Boolean
 
-		If value Is Nothing Then Return False
-
-		If index >= 0 AndAlso value.GetType() Is GetType(String).MakeArrayType() Then
+		If Not value Is Nothing AndAlso index >= 0 AndAlso value.GetType() Is GetType(String).MakeArrayType() Then
 			Return Ln(value) > index AndAlso Not String.IsNullOrEmpty(value(index))
-		ElseIf index <= 0
+		ElseIf Not value Is Nothing AndAlso index <= 0
 			Return Not String.IsNullOrEmpty(value)
 		Else
 			Return False
@@ -458,11 +447,9 @@
 	) As T()
 
 		Dim lstTarget As New List(Of T)
-
 		For i As Integer = 0 To aryObjects.Length - 1
 			lstTarget.AddRange(aryObjects(i))
 		Next
-
 		Return lstTarget.ToArray
 
 	End Function
@@ -473,12 +460,9 @@
 	)
 
 		If aryObjects Is Nothing Then aryObjects = Array.CreateInstance(GetType(T), 0)
-
 		Dim aryNewObjects As Array = System.Array.CreateInstance(GetType(T), aryObjects.Length + 1)
-
 		aryObjects.CopyTo(aryNewObjects, 0)
 		aryNewObjects(aryNewObjects.Length - 1) = objectToAdd
-
 		aryObjects = aryNewObjects
 
 	End Sub
@@ -489,7 +473,6 @@
 	) As String()
 
 		Dim aryTarget(Ln(arySource) - 1) As String
-
 		For i As Integer = 0 to Ln(arySource) - 1
 			If format.IndexOf("{0:U}") >= 0 Then
 				aryTarget(i) = String.Format(format.Replace("{0:U}", "{0}"), arySource(i).ToUpper)
@@ -499,7 +482,6 @@
 				aryTarget(i) = String.Format(format, arySource(i))
 			End If
 		Next
-
 		Return aryTarget
 
 	End Function
@@ -508,18 +490,8 @@
 		ByVal member_Name As String _
 	) As String
 
-		Dim unsafe_Names As String() = New String() _
-			{"Function", "Alias", "Method", "Property", "Variable", "Single", "String", "Double", "Integer", "Long", _
-				"Short", "Module", "Class", "Static", "Boolean", "End", "Date", "ReadOnly", "WriteOnly", "Private", _
-				"Protected", "Friend", "Public", "Implements", "Namespace", "Error", "Nothing", "Select", "Exit", _
-				"Like", "In", "And", "Or", "Operator", "Object", "New", "To", "Return", "Stop", "Option", "Imports", _
-				"Default", "Event", "On", "Type", "Next"}
-
-		For i As Integer = 0 to unsafe_Names.Length - 1
-
-			If String.Compare(member_Name, unsafe_Names(i), True) = 0 Then _
-				Return SQUARE_BRACKET_START & member_Name & SQUARE_BRACKET_END
-
+		For i As Integer = 0 to UNSAFE_NAMES.Length - 1
+			If String.Compare(member_Name, UNSAFE_NAMES(i), True) = 0 Then Return SQUARE_BRACKET_START & member_Name & SQUARE_BRACKET_END
 		Next
 
 		Return member_Name
