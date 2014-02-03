@@ -1,0 +1,14 @@
+<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Behaviours\VB_DbConsumer.tt" #>
+<# Id(+0) #>#Region " DbConsumer Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Constant.tt", False, Cp("Cn_Visibility", "Public"), Cp("Cn_Name", "CONFIGURATION_DB_MAIN"), _
+	Cp("Cn_Value", Db_SettingsKey), Cp("Cn_Description", "Configuration Key Name for DB")) #>
+<# Lf(+1) #>
+<# Id(+0) #><#= Ct("Patterns", "VB_Variable.tt", False, Cp("Va_Visibility", "Private"), Cp("Va_Name", "_DB"), _
+	Cp("Va_Type", Db_DatabaseType), Cp("Va_Default", "New " & Db_DatabaseType & "(System.Configuration.ConfigurationManager.ConnectionStrings(CONFIGURATION_DB_MAIN).ConnectionString())"), _
+	Cp("Va_Description", "Internal Reference to DB Connection Object")) #>
+<# Lf(+1) #>
+<# Id(+0) #><#= Ct("Patterns", "VB_Property.tt", False, Cp("Pr_Visibility", "Public"), Cp("Pr_Name", "DB"), Cp("Pr_Type", "System.Data.IDbConnection"), _
+	Cp("Pr_Get", "Return _DB"), Cp("Pr_Description", "DB Connection Object")) #>
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #>

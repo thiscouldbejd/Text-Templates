@@ -1,0 +1,16 @@
+<#@ template language="VB" hostspecific="True" #><#@ include file="%TEMPLATES_PATH%\Behaviours\VB_HttpHandler.tt" #>
+<# Id(+0) #>#Region " IHttpHandler Implementation "
+<# Lf(+1) #>
+<# Id(+1) #><#= Ct("Patterns", "VB_Properties.tt", False, Cp("Pr_Visibility", "Public"), Ca("Pr_Names", "IHttpHandler_IsReusable"), _
+	Ca("Pr_Types", "System.Boolean"), Ca("Pr_Implements", "System.Web.IHttpHandler.IsReusable"), _
+	Ca("Pr_Gets", "Return " & Ha_Reusable.ToString()), Ca("Pr_Descriptions", "Is Reusable Implementation for IHttpHandler")) #>
+<# Lf(+1) #>
+<# Id(+0) #>#Region " Public Shared Query String Constants "
+<# Lf(+1) #>
+<# Id(+1) #><# For i = 0 to Ln(Ha_QueryNames) - 1 #>
+<# Id(+0) #><#= Ct("Patterns", "VB_Constant.tt", False, Cp("Cn_Visibility", "Public"), Cp("Cn_Name", Ha_ConstantName), _
+	Cp("Cn_Value", Ha_ConstantValue), Cp("Cn_Description", "Constant for Query String Parameter: " & Av(Ha_QueryNames, i))) #>
+<# Lf(+1) #><# Next #>
+<# Id(-1) #>#End Region
+<# Lf(+1) #>
+<# Id(-1) #>#End Region<# Lf(+1) #>

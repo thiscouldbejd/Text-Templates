@@ -1,0 +1,28 @@
+<#+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Cl_Name As String										' Name of the Collection
+	Public Db_SettingsName As String								' Settings Key Name for DB Collection (Default to Class Name)
+	Public Db_DatabaseTypeName As String							' Type for Database (sql or oledb [case insensitive], defaults to sql)
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
+	Public ReadOnly Property Db_SettingsKey() As String
+		Get
+			If Hv(Db_SettingsName) Then
+				Return "DB." & Db_SettingsName
+			Else
+				Return "DB." & Cl_Name
+			End If
+		End Get
+	End Property
+
+	Public ReadOnly Property Db_DatabaseType() As String
+		Get
+			If Hv(Db_DatabaseTypeName) AndAlso String.Compare(Db_DatabaseTypeName.ToUpper(), "OLEDB") = 0 Then
+				Return "System.Data.OleDb.OleDbConnection"
+			Else
+				Return "System.Data.SqlClient.SqlConnection"
+			End If
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

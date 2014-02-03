@@ -1,0 +1,35 @@
+<#+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' INTERNAL VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Private i As Integer = 0										' Current Iterative Index
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	' TEMPLATE VARIABLES											'
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public Ha_Reuse As String										' Whether the Handler Class Is Re-Usable
+	Public Ha_QueryNames As String()								'
+	Public Ha_QueryKeys As String()									'
+
+	Public ReadOnly Property Ha_Reusable() As Boolean
+		Get
+			If Hv(Ha_Reuse) Then
+				Return Boolean.Parse(Ha_Reuse)
+			Else
+				Return True
+			End If
+		End Get
+	End Property
+
+	Public ReadOnly Property Ha_ConstantName() As String
+		Get
+			Return "QUERY_" & Av(Ha_QueryNames, i).ToUpper()
+		End Get
+	End Property
+
+	Public ReadOnly Property Ha_ConstantValue() As String
+		Get
+			Return Av(Ha_QueryKeys, i).ToLower()
+		End Get
+	End Property
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' #>

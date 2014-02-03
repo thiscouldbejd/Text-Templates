@@ -25,7 +25,7 @@
 	Public Pr_Implements As String() = New String() {}				' Implements of the Properties (i)
 	Public Pr_Defaults As Boolean() = New Boolean() {}				' Defaults of the Properties
 	Public Pr_Shadows As Boolean() = New Boolean() {}				' Shadows of the Properties
-	Public Pr_Overridables As Boolean() = New Boolean() {}  ' Overridables of the Properties (o)
+	Public Pr_Overridables As Boolean() = New Boolean() {}  		' Overridables of the Properties (o)
 	Public Pr_ParametersNames As String()()							' Parameter Names of the Properties (p)
 	Public Pr_ParametersTypes As String()()							' Parameter Types of the Properties (q)
 
