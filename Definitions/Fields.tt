@@ -119,35 +119,35 @@
 
 	Public ReadOnly Property Fd_IsNullable As Boolean				' Whether the Field is a Nullable Type
 		Get
-			Return Fd_Type.ToLower().Contains("nullable(of ") AndAlso _
-				Fd_Type.EndsWith(")")
+			If Not String.IsNullOrEmpty(Fd_Type) Then Return Fd_Type.ToLower() _
+				.Contains("nullable(of ") AndAlso Fd_Type.EndsWith(")") Else Return False
 		End Get
 	End Property
 
 	Public ReadOnly Property Fd_IsGuid As Boolean					' Whether the Field is a Guid
 		Get
-			Return (Fd_Type.TrimEnd(")").ToLower().EndsWith("system.guid") OrElse _
-				Fd_Type.TrimEnd(")").ToLower().EndsWith("guid"))
+			If Not String.IsNullOrEmpty(Fd_Type) Then Return (Fd_Type.TrimEnd(")").ToLower() _
+				.EndsWith("system.guid") OrElse Fd_Type.TrimEnd(")").ToLower().EndsWith("guid")) Else Return False
 		End Get
 	End Property
 
 	Public ReadOnly Property Fd_IsDateTime As Boolean				' Whether the Field is a DateTime
 		Get
-			Return (Fd_Type.TrimEnd(")").ToLower().EndsWith("system.datetime") OrElse _
-				Fd_Type.TrimEnd(")").ToLower().EndsWith("datetime"))
+			If Not String.IsNullOrEmpty(Fd_Type) Then Return (Fd_Type.TrimEnd(")").ToLower() _
+				.EndsWith("system.datetime") OrElse Fd_Type.TrimEnd(")").ToLower().EndsWith("datetime")) Else Return False
 		End Get
 	End Property
 
 	Public ReadOnly Property Fd_IsString As Boolean					' Whether the Field is a String
 		Get
-			Return (Fd_Type.TrimEnd(")").ToLower().EndsWith("system.string") OrElse _
-				Fd_Type.TrimEnd(")").ToLower().EndsWith("string"))
+			If Not String.IsNullOrEmpty(Fd_Type) Then Return (Fd_Type.TrimEnd(")").ToLower() _
+				.EndsWith("system.string") OrElse Fd_Type.TrimEnd(")").ToLower().EndsWith("string")) Else Return False
 		End Get
 	End Property
 
 	Public ReadOnly Property Fd_IsInteger As Boolean				' Whether the Field is an Integer
 		Get
-			Return (Fd_Type.TrimEnd(")").ToLower().EndsWith("system.byte") OrElse _
+			If Not String.IsNullOrEmpty(Fd_Type) Then Return (Fd_Type.TrimEnd(")").ToLower().EndsWith("system.byte") OrElse _
 				Fd_Type.TrimEnd(")").ToLower().EndsWith("system.sbyte") OrElse _
 				Fd_Type.TrimEnd(")").ToLower().EndsWith("byte") OrElse _
 				Fd_Type.TrimEnd(")").ToLower().EndsWith("system.int16") OrElse _
@@ -158,14 +158,14 @@
 				Fd_Type.TrimEnd(")").ToLower().EndsWith("int32") OrElse _
 				Fd_Type.TrimEnd(")").ToLower().EndsWith("system.int64") OrElse _
 				Fd_Type.TrimEnd(")").ToLower().EndsWith("system.uint64") OrElse _
-				Fd_Type.TrimEnd(")").ToLower().EndsWith("int64"))
+				Fd_Type.TrimEnd(")").ToLower().EndsWith("int64")) Else Return False
 		End Get
 	End Property
 
 	Public ReadOnly Property Fd_IsSystemType As Boolean				' Whether the Field is a System Type
 		Get
-			Return Fd_Type.ToLower().StartsWith("system.") OrElse _
-				Fd_Type.ToLower().Contains("(system.")
+			If Not String.IsNullOrEmpty(Fd_Type) Then Return Fd_Type.ToLower() _
+				.StartsWith("system.") OrElse Fd_Type.ToLower().Contains("(system.") Else Return False
 		End Get
 	End Property
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
