@@ -30,9 +30,11 @@ An example todo.tt file might be as follows:
 
 This would generate a VB.NET class that would have 4 fields (e.g. variables/properties) and 4 different 'behaviours'. In this case, there would be a custom implementation of 'IComparable' (comparing the values of the Todo_Date field), a custom 'ToString/IFormattable' implementation and the ability to retrieve/save to a standard .Net Database (e.g. SQL or OLEDB). Minimal hassle, maximum functionality. The output code is a partial class, allowing you to add further code as required.
 
-Usage
------
+Configuration and Usage
+-----------------------
 You will need an environmental variable entitled **TEMPLATES_PATH** on your system which points to the root directory of these templates (in order to allow them to be loaded and applied dynamically). Without this, they will not work and you'll get lots of unhelpful transformation errors when you try to use them.
+
+You can also set a second environmental variable called **DEVELOPMENT_PATH** which should point to your root Git directory (e.g. the parent directory to this repo directory). This will then be used to remove full file paths in output files (useful if you are pushing code back to a Git repository or source-code management system).
 
 You can then use a tool, such as Microsoft's [TextTransform](http://msdn.microsoft.com/en-us/library/bb126245.aspx "TextTransform Documentation") command line transformation tool, to generate code files from the templates. Simply transform your class .tt file into an output code file.
 
