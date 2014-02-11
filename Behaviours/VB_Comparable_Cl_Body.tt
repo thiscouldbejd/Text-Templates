@@ -8,7 +8,8 @@
 <# Id(+1) #>ByVal value As System.Object _
 <# Id(-1) #>) As System.Int32 Implements System.IComparable.CompareTo
 <# Lf(+1) #>
-<# Id(+1) #>Dim typed_Value As <#= Sn(Cl_Name) #> = TryCast(value, <#= Sn(Cl_Name) #>)
+<# Id(+1) #>If value Is Nothing Then Return 1
+<# Lf(+1) #>Dim typed_Value As <#= Sn(Cl_Name) #> = TryCast(value, <#= Sn(Cl_Name) #>)
 <# Lf(+1) #>
 <# Id(+0) #>If typed_Value Is Nothing Then
 <# Lf(+1) #>
@@ -18,7 +19,15 @@
 <# Lf(+1) #>
 <# Id(+1) #>Dim return_Value As Integer = 0
 <# Lf(+1) #><#If Not Fd_Comparable Is Nothing Then#><# For i As Integer = 0 To Ln(Fd_Comparable) - 1 #>
-<# Id(+0) #><#= Null_Test(Fd_Comparable(i)) #>return_Value = <#= Comparable_Test(Fd_Comparable(i)) #>(typed_Value.<#= Sn(Fd_Comparable(i)) #>)
+<# Id(+0) #>If <#= Null_Test(Fd_Comparable(i), "", False) #> AndAlso <#= Null_Test(Fd_Comparable(i), "typed_Value", False) #> Then
+<# Id(+1) #>return_Value = 0
+<# Id(-1) #>ElseIf <#= Null_Test(Fd_Comparable(i), "", False) #> Then
+<# Id(+1) #>return_Value = -1
+<# Id(-1) #>ElseIf <#= Null_Test(Fd_Comparable(i), "typed_Value", False) #> Then
+<# Id(+1) #>return_Value = 1
+<# Id(-1) #>Else
+<# Id(+1) #>return_Value = <#= Comparable_Test(Fd_Comparable(i)) #>(typed_Value.<#= Sn(Fd_Comparable(i)) #>)
+<# Id(-1) #>End If
 <# Id(+0) #>If return_Value <> 0 Then Return return_Value
 <# Lf(+1) #><# Next #><# End If #>
 <# Id(+0) #>Return return_Value
@@ -30,8 +39,7 @@
 <# Id(-1) #>#End Region
 <# Lf(+1) #>
 <# Id(-1) #>#End Region
-<#+
-	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+<#+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	' TEMPLATE VARIABLES											'
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	Public Fd_Comparable As String()								' Names of the Comparable Fields
@@ -41,8 +49,12 @@
 	' TEMPLATE Methods												'
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	Public Function Null_Test( _
-		ByRef field_Name As String _
+		ByRef field_Name As String, _
+		Optional ByVal prefix As String = "", _
+		Optional ByVal _not As Boolean = True _
 	) As String
+
+		If Not String.IsNullOrEmpty(prefix) AndAlso Not prefix.EndsWith(".") Then prefix = prefix & "."
 
 		For Fd_Current = 0 To Ln(Fd_Names) - 1
 
@@ -54,7 +66,15 @@
 
 				If Fd_ActualType Is Nothing OrElse (Fd_ActualType.IsValueType() = False AndAlso Fd_ActualType.IsEnum() = False) Then
 
-					Return String.Format("If Not {0} Is Nothing Then ", _field_Name)
+					If _not Then
+
+						Return String.Format("Not {1}{0} Is Nothing", _field_Name, prefix)
+
+					Else
+
+						Return String.Format("{1}{0} Is Nothing", _field_Name, prefix)
+
+					End If
 
 				Else
 
@@ -80,7 +100,7 @@
 
 				field_Name = Fd_Get
 				Dim _field_Name As String = field_Name
-				If _field_Name.ToLower() = "value" Then _field_Name = "Me." & _field_Name
+				If _field_Name.ToLower() = "value" Then _field_Name = "Me." & Sn(_field_Name)
 
 				If Fd_ActualType Is Nothing OrElse (Not Fd_ActualType Is System.Type.GetType("System.String") AndAlso Fd_ActualType.IsValueType() = False AndAlso Fd_ActualType.IsEnum() = False) Then
 
