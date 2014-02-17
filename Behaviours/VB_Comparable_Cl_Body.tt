@@ -49,7 +49,7 @@
 	' TEMPLATE Methods												'
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	Public Function Null_Test( _
-		ByRef field_Name As String, _
+		ByVal field_Name As String, _
 		Optional ByVal prefix As String = "", _
 		Optional ByVal _not As Boolean = True _
 	) As String
@@ -62,24 +62,32 @@
 
 				field_Name = Fd_Get
 				Dim _field_Name As String = field_Name
-				If _field_Name.ToLower() = "value" Then _field_Name = "Me." & _field_Name
+				If _field_Name.ToLower() = "value" AndAlso String.IsNullOrEmpty(prefix) Then _field_Name = "Me." & _field_Name
 
-				If Fd_ActualType Is Nothing OrElse (Fd_ActualType.IsValueType() = False AndAlso Fd_ActualType.IsEnum() = False) Then
+				If Fd_ActualType Is Nothing OrElse (Fd_ActualType.IsValueType() = False AndAlso Fd_ActualType.IsEnum() = False AndAlso Fd_IsNullable = False) Then
 
 					If _not Then
 
-						Return String.Format("Not {1}{0} Is Nothing", _field_Name, prefix)
+						Return String.Format("Not {1}{0} Is Nothing", Sn(_field_Name), prefix)
 
 					Else
 
-						Return String.Format("{1}{0} Is Nothing", _field_Name, prefix)
+						Return String.Format("{1}{0} Is Nothing", Sn(_field_Name), prefix)
 
 					End If
 
 				Else
 
-					Return String.Empty
+					If _not Then
 
+						Return String.Format("Not {1}{0} = Nothing", Sn(_field_Name), prefix)
+
+					Else
+
+						Return String.Format("{1}{0} = Nothing", Sn(_field_Name), prefix)
+
+					End If
+					
 				End If
 
 			End If
@@ -91,7 +99,7 @@
 	End Function
 
 	Public Function Comparable_Test( _
-		ByRef field_Name As String _
+		ByVal field_Name As String _
 	) As String
 
 		For Fd_Current = 0 To Ln(Fd_Names) - 1
@@ -104,11 +112,11 @@
 
 				If Fd_ActualType Is Nothing OrElse (Not Fd_ActualType Is System.Type.GetType("System.String") AndAlso Fd_ActualType.IsValueType() = False AndAlso Fd_ActualType.IsEnum() = False) Then
 
-					Return String.Format("DirectCast({0}, System.IComparable).CompareTo", _field_Name)
+					Return String.Format("DirectCast({0}, System.IComparable).CompareTo", Sn(_field_Name))
 					
 				Else
 
-					Return String.Format("{0}.CompareTo", _field_Name)
+					Return String.Format("{0}.CompareTo", Sn(_field_Name))
 
 				End If
 
