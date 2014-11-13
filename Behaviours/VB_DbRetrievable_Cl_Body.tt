@@ -59,7 +59,7 @@ Cp("Va_Defaults", New String() {"", "", "", "", "", "System.Threading.Thread.Cur
 <# Id(+0) #><# If field_IndexType = "Single" Or field_IndexType = "System.Single" Then field_IndexType = "System.Float"  #>
 <# Id(+0) #><# If field_IndexType = "System.Byte()" OrElse field_IndexType = "Byte()" Then #>
 <# Id(+1) #>Dim <#= Fd_IndexVariables(i) #>_S As System.Int64 = reader.GetBytes(<#= Fd_IndexVariables(i) #>, 0, Nothing, 0, 0)
-<# Id(+0) #>value.<#= Fd_IndexSets(i) #> = New System.Byte(<#= Fd_IndexVariables(i) #>_S - 1) {}
+<# Id(+0) #>value.<#= Fd_IndexSets(i) #> = New System.Byte(CInt(<#= Fd_IndexVariables(i) #>_S) - 1) {}
 <# Id(+0) #>Dim <#= Fd_IndexVariables(i) #>_B As Integer = 1024
 <# Id(+0) #>Dim <#= Fd_IndexVariables(i) #>_R As Long = 0
 <# Id(+0) #>Dim <#= Fd_IndexVariables(i) #>_P As Integer = 0
@@ -67,7 +67,7 @@ Cp("Va_Defaults", New String() {"", "", "", "", "", "System.Threading.Thread.Cur
 <# Id(+0) #>While (<#= Fd_IndexVariables(i) #>_R < <#= Fd_IndexVariables(i) #>_S)
 <# Lf(+1) #>
 <# Id(+1) #>If (<#= Fd_IndexVariables(i) #>_S - <#= Fd_IndexVariables(i) #>_R < <#= Fd_IndexVariables(i) #>_B) Then
-<# Id(+1) #><#= Fd_IndexVariables(i) #>_B = <#= Fd_IndexVariables(i) #>_S - <#= Fd_IndexVariables(i) #>_R
+<# Id(+1) #><#= Fd_IndexVariables(i) #>_B = CInt(<#= Fd_IndexVariables(i) #>_S - <#= Fd_IndexVariables(i) #>_R)
 <# Id(-1) #>End If
 <# Lf(+1) #>
 <# Id(+0) #><#= Fd_IndexVariables(i) #>_R += reader.GetBytes(<#= Fd_IndexVariables(i) #>, <#= Fd_IndexVariables(i) #>_P, value.<#= Fd_IndexSets(i) #>, <#= Fd_IndexVariables(i) #>_P, <#= Fd_IndexVariables(i) #>_B)
@@ -76,7 +76,7 @@ Cp("Va_Defaults", New String() {"", "", "", "", "", "System.Threading.Thread.Cur
 <# Id(-1) #>End While
 <# Lf(+1) #>
 <# Id(-1) #>End If<# Id(+1) #><# Else #>
-<# Id(+1) #>value.<#= Fd_IndexSets(i) #> = <# If field_IndexType.StartsWith("System.") Then #>reader.Get<#= field_IndexType.Substring(field_IndexType.LastIndexOf(".") + 1).TrimEnd(")") #>(<#= Fd_IndexVariables(i) #>)<# Else #>CType(reader.GetValue(<#= Fd_IndexVariables(i) #>), <#= field_IndexType #>)<# End If #>
+<# Id(+1) #>value.<#= Fd_IndexSets(i) #> = <# If Not Needs_Generic_Get(field_IndexType) Then #>reader.Get<#= field_IndexType.Substring(field_IndexType.LastIndexOf(".") + 1).TrimEnd(")") #>(<#= Fd_IndexVariables(i) #>)<# Else #>CType(reader.GetValue(<#= Fd_IndexVariables(i) #>), <#= field_IndexType #>)<# End If #>
 <# Id(+0) #><# End If #>
 <# Lf(+1) #>
 <# Id(-1) #><# Next #>
@@ -820,6 +820,22 @@ Cp("Va_Defaults", New String() {"", "", "", "", "", "System.Threading.Thread.Cur
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	' TEMPLATE PROPERTIES											'
 	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	Public ReadOnly Property Needs_Generic_Get( _
+		ByVal type_Name As String _
+	) As Boolean
+		Get
+			If String.IsNullOrEmpty(type_Name) Then Return False
+			type_Name = type_Name.ToLower()
+			If type_Name = "system.timespan" Then
+				Return True
+			ElseIf type_Name.StartsWith("system.") Then
+				Return False
+			Else
+				Return True
+			End If
+		End Get
+	End Property
+
 	Public ReadOnly Property Db_View As String						' The View is Read-Only (e.g. just used for Selects)
 		Get
 			If Hv(Cl_Mapping(P_DB_VIEW)) Then
